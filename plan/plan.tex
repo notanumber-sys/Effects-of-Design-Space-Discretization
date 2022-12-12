@@ -37,20 +37,50 @@
 \maketitle
 
 \section{Background}
+A MultiProcessor System on Chip (MPSoC) is a system of multiple microprocessors integrated on a single chip. The microprocessors are often heterogeneous and can include for example Central Processing Units (CPUs), Graphics Processing Units (GPUs), and Field Programmable Gate Arrays (FPGAs) depending on the target application of the chip. FPGAs are integrated circuits that provide a configurable and highly parallel computational resource. FPGAs are widely used for applications where production size is to low to motivate custom Application-Specific Integrated Circuits (ASICs), for prototyping to reduce iteration cost, as hardware accelerators where their ability to process a lot of data in parallel can be used, and for applications where the ''hardware'' needs to be reconfigured frequently.
 
+When designing or choosing a system (for example a MPSoC) for a particular application, it is often desirable to pick the ''cheapest'' allowable hardware configuration for the task (according to some metric, for example power consumption or hardware cost). It is also desirable to schedule/map hardware resources as efficiently as possible, either to utilize the hardware to a higher degree, or to be able to use less resources which might then be available for other tasks. E.g. given some hardware it is desirable to use it as efficiently as possible, and given some task it is desirable to use as little computational resources as possible to run it. The process of finding optimal configurations is known as Design Space Exploration (DSE). In general, the DSE task is NP-complete and has historically been a largely manual process. More or less automated ways of doing DSE has been developed where the goal is to use optimization techniques to find good solutions within a space of design criteria that satisfy some criteria and often maximize/minimize some cost metrics. These methods often utilizing heuristics or manual input to reduce the problem size. Heterogeneous MPSoCs with FPGAs provide a particularly difficult situation where the properties of the different hardware resources and the reconfigurability of the FPGAs make the design space very large. Design Space Identification (DSI) is a systematic approach to converting a hardware description and a computational problem to a combined form that can be used within DSE [1].
 
 \section{Application}
-
+This project is concerned with an application of DSE on a Xilinx MPSoC with CPU, GPU, and reconfigurable FPGA resources. The ultimate use case concerns a dynamic scenario where different processes with different priorities need to be scheduled and run on the chip. The processes can run on some combination of the chip's resources (eg. a certain process may be able to run slowly on a CPU core or quickly on the FPGA), and the goal is to determine a way to schedule processes on the available resources including possible reconfigurations of the FPGA that results in performance that is as close to optimal as possible.
 
 \subsection{Mathematical/Numerical Aspects}
+Finding the optimal solution to the design-space problem is an NP-complete problem. Historically, computational DSE has been limited by computational resources, and approaches have required limiting assumptions or have been largely heuristical. These methods tend to give solutions that are good but not optimal, and they can sometimes be improved considerably. Ingo Sander et.al. has showcased solutions utilizing Constraint Programming (CP) that builds a discrete model of the system and computational problem and then uses a combination of heuristics and search to limit the design space. This makes it possible to obtain good solutions fairly quickly, and also to prove optimality in certain cases [2]. This project aims to build on these methods by extending the IDeSyDe tool [3] within the ForSyDe framework [4].
 
+We recognise that the full scope of adapting the IDeSyDe tool to Saab's application, and answering all of Saab's questions in the general dynamic load case scenario is an extremely complex problem outside of the reasonable scope of this project. The goal will instead be to focus on some static load case scenario and to adapting the current tool set the problem when possible. The project should 
 
+The goal of the project is to:
+\begin{enumerate}
+\item Develop models for Saab's hardware.
+\item Extend the IDeSyDe tool with models and heuristics.
+\item Investigate Saab's questions with regards to FPGA reconfiguration, scheduling, and how big improvements can be expected.
+\end{enumerate}
 \section{Initial Plan}
+Table \ref{timeplan} shows a preliminary time plan for the project.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{c|l}
+		Week(s) & Task \\
+		\hline
+		3-5 & Literature study. \\
+		6-8 & Application \& platform model. \\
+		9-14 & Try to find good solutions. \\
+		15-17 & Hardware testing and validation. \\
+		18-20 & Report draft. \\
+		21 & Revisions and final report deadline.
+	\end{tabular}
+    \caption{Preliminary time plan for the project.}
+	\label{timeplan}
+\end{table}
 
 
 \section{References}
-
-
-Write a short description of your project where you briefly explain the background, the application and the main mathematical/numerical problems involved. Outline your ideas on how to tackle the problem and a time schedule for the work. List some references (books/articles) that you think can be used as a starting point for the work.
+\begin{enumerate}
+\item R. Jordão, I. Sander and M. Becker, "Formulation of Design Space Exploration Problems by Composable Design Space Identification," 2021 Design, Automation \& Test in Europe Conference \& Exhibition (DATE), 2021, pp. 1204-1207, doi: 10.23919/DATE51398.2021.9474082.
+\item Kathrin Rosvall and Ingo Sander. 2017. Flexible and Tradeoff-Aware Constraint-Based Design Space Exploration for Streaming Applications on Heterogeneous Platforms. ACM Trans. Des. Autom. Electron. Syst. 23, 2, Article 21 (March 2018), 26 pages. \url{https://doi.org/10.1145/3133210}
+\item IDeSyDe repository and documentation: \url{https://github.com/forsyde/IDeSyDe/}
+\item ForSyDe website: \url{https://forsyde.github.io/}
+\end{enumerate}
 
 \end{document}
