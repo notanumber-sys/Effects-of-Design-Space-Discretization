@@ -1,4 +1,4 @@
-\documentclass[12pt,titlepage]{article}
+\documentclass[12pt,notitlepage]{article}
 
 \usepackage[utf8]{inputenc}
 %\usepackage[english]{babel}
@@ -23,7 +23,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\emph{L. Karlsson}}
+\fancyhead[L]{\emph{L. Karlsson; version 0.1}}
 \fancyhead[R]{\emph{\leftmark}}
 \fancyfoot[C]{\thepage}
 
@@ -31,7 +31,7 @@
 
 \title{Thesis Project Plan\\SF250X}
 \author{Ludwig Karlsson\\ludwigka@kth.se}
-\date{2022-12-01}
+\date{2022-12-13}
 
 \begin{document}
 \maketitle
@@ -39,24 +39,31 @@
 \section{Background}
 A MultiProcessor System on Chip (MPSoC) is a system of multiple microprocessors integrated on a single chip. The microprocessors are often heterogeneous and can include for example Central Processing Units (CPUs), Graphics Processing Units (GPUs), and Field Programmable Gate Arrays (FPGAs) depending on the target application of the chip. FPGAs are integrated circuits that provide a configurable and highly parallel computational resource. FPGAs are widely used for applications where production size is to low to motivate custom Application-Specific Integrated Circuits (ASICs), for prototyping to reduce iteration cost, as hardware accelerators where their ability to process a lot of data in parallel can be used, and for applications where the ''hardware'' needs to be reconfigured frequently.
 
-When designing or choosing a system (for example a MPSoC) for a particular application, it is often desirable to pick the ''cheapest'' allowable hardware configuration for the task (according to some metric, for example power consumption or hardware cost). It is also desirable to schedule/map hardware resources as efficiently as possible, either to utilize the hardware to a higher degree, or to be able to use less resources which might then be available for other tasks. E.g. given some hardware it is desirable to use it as efficiently as possible, and given some task it is desirable to use as little computational resources as possible to run it. The process of finding optimal configurations is known as Design Space Exploration (DSE). In general, the DSE task is NP-complete and has historically been a largely manual process. More or less automated ways of doing DSE has been developed where the goal is to use optimization techniques to find good solutions within a space of design criteria that satisfy some criteria and often maximize/minimize some cost metrics. These methods often utilizing heuristics or manual input to reduce the problem size. Heterogeneous MPSoCs with FPGAs provide a particularly difficult situation where the properties of the different hardware resources and the reconfigurability of the FPGAs make the design space very large. Design Space Identification (DSI) is a systematic approach to converting a hardware description and a computational problem to a combined form that can be used within DSE [1].
+When designing or choosing a system (for example an MPSoC) for a particular application, it is often desirable to pick the ''cheapest'' allowable hardware configuration for the task (according to some metric, for example power consumption or hardware cost). It is also often desirable to schedule/map different processes to hardware resources as efficiently as possible, for example to maximize data throughput, or to be able to use less resources to reduce power consumption or leave it available for other tasks\footnote{E.g. given some hardware it is desirable to use it as efficiently as possible, and given some task it is desirable to use as little computational resources as possible to run it.}. The process of finding optimal configurations is known as Design Space Exploration (DSE). In general, the DSE task is NP-complete and has historically been a largely manual process. More or less automated ways of doing DSE has been developed where the goal is to use optimization techniques to find good solutions within a space of design criteria that satisfy some criteria and often maximize/minimize some cost metrics. These methods often utilize heuristics or manual input to reduce the problem size. Heterogeneous MPSoCs with FPGAs provide a particularly difficult situation where the properties of the different hardware resources and the reconfigurability of the FPGAs make the design space very large. Design Space Identification (DSI) is a systematic approach to converting simpler models of hardware and a computational problem to a combined form that can be used within DSE [1].
 
 \section{Application}
-This project is concerned with an application of DSE on a Xilinx MPSoC with CPU, GPU, and reconfigurable FPGA resources. The ultimate use case concerns a dynamic scenario where different processes with different priorities need to be scheduled and run on the chip. The processes can run on some combination of the chip's resources (eg. a certain process may be able to run slowly on a CPU core or quickly on the FPGA), and the goal is to determine a way to schedule processes on the available resources including possible reconfigurations of the FPGA that results in performance that is as close to optimal as possible.
+This project is concerned with an application at Saab of DSE on a Xilinx MPSoC with CPU, GPU, and reconfigurable FPGA resources. The use case concerns a dynamic scenario where different processes with different priorities need to be scheduled and run on the chip. The processes can run on some combination of the chip's resources (eg. a certain process may be able to run on a CPU core or on the FPGA), and the ultimate goal is to determine a way to schedule processes on the available resources including possible reconfigurations of the FPGA that results in performance that is as close to optimal as possible.
 
 \subsection{Mathematical/Numerical Aspects}
-Finding the optimal solution to the design-space problem is an NP-complete problem. Historically, computational DSE has been limited by computational resources, and approaches have required limiting assumptions or have been largely heuristical. These methods tend to give solutions that are good but not optimal, and they can sometimes be improved considerably. Ingo Sander et.al. has showcased solutions utilizing Constraint Programming (CP) that builds a discrete model of the system and computational problem and then uses a combination of heuristics and search to limit the design space. This makes it possible to obtain good solutions fairly quickly, and also to prove optimality in certain cases [2]. This project aims to build on these methods by extending the IDeSyDe tool [3] within the ForSyDe framework [4].
+Finding the optimal solution to the design-space problem is an NP-complete problem. Historically, computational DSE has been limited by computational resources, and approaches have required limiting assumptions or have been largely heuristical. These methods tend to give solutions that are good but not optimal, and they can sometimes be improved considerably. Ingo Sander et.al. has showcased solutions utilizing Constraint Programming (CP) that builds a discrete model of the system and computational problem and then uses a combination of heuristics and search to limit the design space. This makes it possible to obtain good solutions fairly quickly, and also to prove optimality in certain cases [2]. This project aims to build on these methods by extending the IDeSyDe tool [3] within the ForSyDe framework [4]. The key focus will be to investigate different solvers and heuristics in order to achieve as good solutions as possible for a reasonable computational cost.
 
-We recognise that the full scope of adapting the IDeSyDe tool to Saab's application, and answering all of Saab's questions in the general dynamic load case scenario is an extremely complex problem outside of the reasonable scope of this project. The goal will instead be to focus on some static load case scenario and to adapting the current tool set the problem when possible. The project should 
+The full scope of adapting the IDeSyDe tool to Saab's application, and answering all of Saab's questions in the general dynamic load case scenario is an extremely complex problem and outside of the reasonable scope of this project. The goal will instead be to focus on some static load case scenario and to adapt the current tool set to the problem when possible.
 
 The goal of the project is to:
 \begin{enumerate}
-\item Develop models for Saab's hardware.
-\item Extend the IDeSyDe tool with models and heuristics.
-\item Investigate Saab's questions with regards to FPGA reconfiguration, scheduling, and how big improvements can be expected.
+	\item Find an interesting static load case scenario. Research and formulate good models for Saab's hardware and application.
+	\item Extend IDeSyDe with models and heuristics so that the tool can be used for the application.
+	\item Investigate Saab's questions within the limitations of the static load case scenario and the model.
+	\begin{enumerate}
+		\item Look at different solvers and heuristics.
+		\item Investigate trade-offs between performance (of the solution) and computational cost for different solvers and heuristics. [Is this reasonable?]
+		\item Look at ways to extend/modify the model to reduce computational cost or improve performance.
+	\end{enumerate}
+	\item Test a solution on hardware. [Is this reasonable?]
 \end{enumerate}
+
 \section{Initial Plan}
-Table \ref{timeplan} shows a preliminary time plan for the project.
+Table \ref{timeplan} shows a preliminary time plan for the project. [WIP]
 
 \begin{table}[H]
 	\centering
@@ -64,16 +71,15 @@ Table \ref{timeplan} shows a preliminary time plan for the project.
 		Week(s) & Task \\
 		\hline
 		3-5 & Literature study. \\
-		6-8 & Application \& platform model. \\
-		9-14 & Try to find good solutions. \\
-		15-17 & Hardware testing and validation. \\
+		6-8 & Application \& platform model. [Q1-2] \\
+		9-14 & Q3 \\
+		15-17 & Hardware testing. [Q4] \\
 		18-20 & Report draft. \\
 		21 & Revisions and final report deadline.
 	\end{tabular}
     \caption{Preliminary time plan for the project.}
 	\label{timeplan}
 \end{table}
-
 
 \section{References}
 \begin{enumerate}
