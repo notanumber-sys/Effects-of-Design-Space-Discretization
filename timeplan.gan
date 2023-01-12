@@ -34,26 +34,26 @@
             <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
-        <task id="0" name="Literature study" color="#eeeeee" meeting="false" start="2023-01-16" duration="15" complete="0" thirdDate="2022-12-23" thirdDate-constraint="0" expand="true">
+        <task id="0" name="Literature study" color="#eeeeee" meeting="false" start="2023-01-16" duration="20" complete="0" thirdDate="2022-12-23" thirdDate-constraint="0" expand="true">
             <depend id="3" type="2" difference="0" hardness="Strong"/>
             <depend id="25" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="3" name="Application &amp; platform model" color="#eeeeee" meeting="false" start="2023-02-06" duration="20" complete="0" thirdDate="2021-12-20" thirdDate-constraint="0" expand="true">
+        <task id="3" name="Application &amp; platform model" color="#eeeeee" meeting="false" start="2023-02-13" duration="20" complete="0" thirdDate="2021-12-20" thirdDate-constraint="0" expand="true">
             <depend id="5" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="5" name="Implementation &amp; experiments" color="#eeeeee" meeting="false" start="2023-03-06" duration="30" complete="0" thirdDate="2021-12-27" thirdDate-constraint="0" expand="true">
+        <task id="5" name="Implementation &amp; experiments" color="#eeeeee" meeting="false" start="2023-03-13" duration="30" complete="0" thirdDate="2021-12-27" thirdDate-constraint="0" expand="true">
             <depend id="6" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="25" name="Report" color="#eeeeee" meeting="false" start="2023-02-06" duration="50" complete="0" thirdDate="2023-01-02" thirdDate-constraint="0" expand="true">
+        <task id="25" name="Report" color="#eeeeee" meeting="false" start="2023-02-13" duration="50" complete="0" thirdDate="2023-01-02" thirdDate-constraint="0" expand="true">
             <depend id="6" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="6" name="Finalize report draft" color="#eeeeee" meeting="false" start="2023-04-17" duration="15" complete="0" thirdDate="2022-01-03" thirdDate-constraint="0" expand="true">
+        <task id="6" name="Finalize report draft" color="#eeeeee" meeting="false" start="2023-04-24" duration="15" complete="0" thirdDate="2022-01-03" thirdDate-constraint="0" expand="true">
             <depend id="11" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="11" name="Feedback &amp; revisions" color="#eeeeee" meeting="false" start="2023-05-08" duration="10" complete="0" thirdDate="2022-01-17" thirdDate-constraint="0" expand="true">
+        <task id="11" name="Feedback &amp; revisions" color="#eeeeee" meeting="false" start="2023-05-15" duration="10" complete="0" thirdDate="2022-01-17" thirdDate-constraint="0" expand="true">
             <depend id="15" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="15" name="Report deadline" color="#ff0000" meeting="true" start="2023-06-02" duration="0" complete="0" thirdDate="2023-06-02" thirdDate-constraint="1" expand="true"/>
+        <task id="15" name="Report deadline" color="#ff0000" meeting="true" start="2023-05-31" duration="0" complete="0" thirdDate="2023-05-31" thirdDate-constraint="1" expand="true"/>
     </tasks>
     <resources/>
     <allocations/>
