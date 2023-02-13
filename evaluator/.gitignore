@@ -1,5 +1,3 @@
-
-
 .bsp/
 .idea/
 target/
@@ -7,5 +5,3 @@ target/
 .metals/
 .vscode/
 project/
-
-
