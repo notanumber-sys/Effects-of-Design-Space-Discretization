@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2023-01-01" view-index="0" gantt-divider-location="227" resource-divider-location="300" version="3.1.3100" locale="en_SE">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2023-01-01" view-index="0" gantt-divider-location="278" resource-divider-location="300" version="3.1.3100" locale="en_SE">
     <description/>
     <view zooming-state="default:9" id="gantt-chart">
-        <field id="tpd3" name="Name" width="221" order="0"/>
+        <field id="tpd3" name="Name" width="218" order="0"/>
+        <field id="tpd6" name="Duration" width="54" order="1"/>
         <option id="color.recent">
-            <![CDATA[#ff0000]]>
+            <![CDATA[#ffcc66 #99ff33 #0033ff #3399ff #ff0000]]>
         </option>
     </view>
     <view id="resource-table">
@@ -20,6 +21,39 @@
             <overriden-day-types/>
             <days/>
         </day-types>
+        <date year="2023" month="3" date="6" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-03-06, 00:00]]>
+        </date>
+        <date year="2023" month="3" date="7" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-03-07, 00:00]]>
+        </date>
+        <date year="2023" month="3" date="8" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-03-08, 00:00]]>
+        </date>
+        <date year="2023" month="3" date="9" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-03-09, 00:00]]>
+        </date>
+        <date year="2023" month="3" date="10" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-03-10, 00:00]]>
+        </date>
+        <date year="2023" month="4" date="7" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-04-07, 00:00]]>
+        </date>
+        <date year="2023" month="4" date="10" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-04-10, 00:00]]>
+        </date>
+        <date year="2023" month="5" date="1" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-05-01, 00:00]]>
+        </date>
+        <date year="2023" month="5" date="18" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-05-18, 00:00]]>
+        </date>
+        <date year="2023" month="6" date="6" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-06-06, 00:00]]>
+        </date>
+        <date year="2023" month="6" date="23" type="HOLIDAY">
+            <![CDATA[Holiday on 2023-06-23, 00:00]]>
+        </date>
     </calendars>
     <tasks empty-milestones="true">
         <taskproperties>
@@ -34,23 +68,32 @@
             <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
-        <task id="0" name="Literature study" color="#eeeeee" meeting="false" start="2023-01-16" duration="20" complete="0" thirdDate="2022-12-23" thirdDate-constraint="0" expand="true">
-            <depend id="3" type="2" difference="0" hardness="Strong"/>
+        <task id="0" name="Initial literature study" color="#99ff33" meeting="false" start="2023-01-16" duration="20" complete="0" thirdDate="2022-12-23" thirdDate-constraint="0" expand="true">
             <depend id="25" type="2" difference="0" hardness="Strong"/>
+            <depend id="64" type="2" difference="0" hardness="Strong"/>
+            <depend id="86" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="3" name="Application &amp; platform model" color="#eeeeee" meeting="false" start="2023-02-13" duration="20" complete="0" thirdDate="2021-12-20" thirdDate-constraint="0" expand="true">
-            <depend id="5" type="2" difference="0" hardness="Strong"/>
-        </task>
-        <task id="5" name="Implementation &amp; experiments" color="#eeeeee" meeting="false" start="2023-03-13" duration="30" complete="0" thirdDate="2021-12-27" thirdDate-constraint="0" expand="true">
+        <task id="64" name="Continous literature study" color="#99ff33" meeting="false" start="2023-02-13" duration="38" complete="0" thirdDate="2023-02-13" thirdDate-constraint="0" expand="true">
             <depend id="6" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="25" name="Report" color="#eeeeee" meeting="false" start="2023-02-13" duration="50" complete="0" thirdDate="2023-01-02" thirdDate-constraint="0" expand="true">
+        <task id="86" name="Main work" color="#0033ff" meeting="false" start="2023-02-13" duration="38" complete="0" thirdDate="2023-02-13" thirdDate-constraint="0" expand="true">
+            <depend id="6" type="2" difference="0" hardness="Strong"/>
+            <task id="94" name="Experimental flow (G1)" color="#3399ff" meeting="false" start="2023-02-13" duration="10" complete="0" thirdDate="2023-02-13" thirdDate-constraint="0" expand="true">
+                <depend id="88" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="88" name="Problem instances (G2)" color="#3399ff" meeting="false" start="2023-02-27" duration="15" complete="0" thirdDate="2021-12-20" thirdDate-constraint="0" expand="true">
+                <depend id="98" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="98" name="Experiments (G4)" color="#3399ff" meeting="false" start="2023-03-27" duration="13" complete="0" thirdDate="2021-12-27" thirdDate-constraint="0" expand="true"/>
+            <task id="100" name="Theoretical treatment (G3)" color="#3399ff" meeting="false" start="2023-02-13" duration="38" complete="0" thirdDate="2023-02-13" thirdDate-constraint="0" expand="true"/>
+        </task>
+        <task id="25" name="Report (G5)" color="#ffcc66" meeting="false" start="2023-02-13" duration="38" complete="0" thirdDate="2023-01-02" thirdDate-constraint="0" expand="true">
             <depend id="6" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="6" name="Finalize report draft" color="#eeeeee" meeting="false" start="2023-04-24" duration="15" complete="0" thirdDate="2022-01-03" thirdDate-constraint="0" expand="true">
+        <task id="6" name="Finalize report draft (G5)" color="#ffcc66" meeting="false" start="2023-04-17" duration="15" complete="0" thirdDate="2022-01-03" thirdDate-constraint="0" expand="true">
             <depend id="11" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="11" name="Feedback &amp; revisions" color="#eeeeee" meeting="false" start="2023-05-15" duration="10" complete="0" thirdDate="2022-01-17" thirdDate-constraint="0" expand="true">
+        <task id="11" name="Feedback &amp; revisions (G5)" color="#ffcc66" meeting="false" start="2023-05-09" duration="10" complete="0" thirdDate="2022-01-17" thirdDate-constraint="0" expand="true">
             <depend id="15" type="2" difference="0" hardness="Strong"/>
         </task>
         <task id="15" name="Report deadline" color="#ff0000" meeting="true" start="2023-05-31" duration="0" complete="0" thirdDate="2023-05-31" thirdDate-constraint="1" expand="true"/>
