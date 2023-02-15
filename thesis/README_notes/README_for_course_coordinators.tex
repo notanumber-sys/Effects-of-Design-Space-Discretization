@@ -1,0 +1,55 @@
+
+\chapter{README and notes for course responsible persons}
+\label{ch:readme_course_responible}
+
+Given that students are going to be in Canvas course rooms and that they are likely to use a version of a template, how can the Canvas course room be set up to make it efficient for students, teachers, administrators, \etc?
+
+\section{Custom columns}
+\label{sec:CRcustomeCOlumns}
+
+One of the first steps is to create some custom columns to be used to store information that is only visible to teachers in the course. What are some useful columns:
+\begin{description}[labelwidth =\widthof{\textbf{Tentative\_title}}, leftmargin = !]
+\item[Tentative\_title]  The working title - initially taken from the proposal
+
+\item[TRITA] To store the TRIA numbers of theses that have been reported in LADOK
+
+\item[Supervisors] Store the supervisors as a comma-separated list of names-
+
+\item[Group] In a degree project course for 1\textsuperscript{st} students, it is useful to be able to store the name of the group, so that one can sort the gradebook based on this field and thus have the group members adjacent in the gradebook.
+\end{description}
+
+Custom columns can be added using a python script, such as the three calls to the script shown in \Cref{lst:CRaddingCustomCOlumns}.
+\Needspace*{4\baselineskip}
+\begin{lstlisting}[basicstyle=\footnotesize, language={bash}, columns=fullflexible, showstringspaces=false, caption={Adding custom columns to the gradebook},label=lst:CRaddingCustomCOlumns]
+insert-column.py 40135 'TRITA'
+insert-column.py 40135 'Tentative_title'
+insert-column.py 40135 'Supervisors'
+\end{lstlisting}
+
+As the list of supervisors can vary over time, a custom column called ``Supervisors'' has been generated that contains a list of the names of the supervisors; for example: ['Anders Västberg', 'Gerald Maguire']. Note that because this list uses a version of the person's name\footnote{In the case of some individuals, there are multiple versions of their name that have been used, so the mapping supports a many-to-one mapping - as there is only one version of the user's name in Canvas.} that may not be the same as the user's Canvas name, a file containing a mapping between these names and the corresponding user's name in Canvas is needed by scripts. As with all custom columns, this column is only visible to teachers in the course.
+
+
+\section{Administrative assignments}
+\label{sec:CRAdministrativeAssignments}
+
+In this case, an ``administrative'' assignment is used that has as its grade scheme a list of all of the examiners in the course. Thus in the grade book, the ``Examiner'' assignment has a ``grade'' for each student that indicates who the examiner is for that student.  This grading scheme can be automatically generated from the set of people who have the Examiner role in this Canvas course room (this is done using the command shown in \Cref{lst:CRaddingGradingStandardA}). Additionally, there is a section in the course created for each examiner (using the sortable version of the examiner's name from Canvas) so that when the student is added to the examiner's section - the examiner can filter their view in the gradebook to see just the students in their section - this makes it much easier for working with the subset of students relevant to this person. This ``administrative'' assignment is not published - so it is only visible to teachers in the course.
+
+Grading standards, \ie a grading scale) can be added using a python script, such as that shown in \Cref{lst:CRaddingGradingStandardA,lst:CRaddingGradingStandardB}.
+\begin{lstlisting}[basicstyle=\footnotesize, language={bash}, columns=fullflexible, showstringspaces=false, caption={Adding a grading standard for all of the examiners to the course},label=lst:CRaddingGradingStandardA]
+./insert_teachers_grading_standard.py -e 40135 --examiners
+\end{lstlisting}
+
+Another ``administrative'' assignment called ``Course code'' is used similarly to the Examiner ``administrative'' assignment but now uses all of the courses codes used in this course room as the grading scheme. This column is populated based on the short version of the course code, such as ``DA231X'' taken from the name of the section names with the course codes that the student is in within this course room. The command for doing this is shown in \Cref{lst:CRaddingGradingStandardA}).
+\begin{lstlisting}[basicstyle=\footnotesize, language={bash}, columns=fullflexible, showstringspaces=false, caption={Adding grade standard for the course codes to the course},label=lst:CRaddingGradingStandardB]
+./insert_course_code_grading_standard.py 40135
+\end{lstlisting}
+
+\section{Utilizing sections in the Canvas course room}
+\label{sec:CRUsingSectionc}
+
+
+Sections are also generated for each of the teachers in the course so that students can be added to their section, and the teacher can filter the gradebook to see just the relevant students. 
+ The command for doing this is shown in \Cref{lst:CRcreatSectionsForTeachers}). The sortable name for each teacher (\ie last\_name, first\_name) is used for the name of the section.
+\begin{lstlisting}[basicstyle=\footnotesize, language={bash}, columns=fullflexible, showstringspaces=false, caption={Create a section for each teacher in the course},label=lst:CRcreatSectionsForTeachers]
+./create_sections_for_teachers-in-course.py 40135
+\end{lstlisting}
