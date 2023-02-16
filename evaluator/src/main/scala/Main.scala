@@ -1,5 +1,9 @@
 import forsyde.io.java.core.ForSyDeSystemGraph;
+import forsyde.io.java.core.Vertex;
 import forsyde.io.java.drivers.ForSyDeModelHandler;
+import org.antlr.v4.semantics.RuleCollector
+import scala.jdk.CollectionConverters.*;
+import breeze.linalg.max
 
 val data_root = "C:\\Users\\u087044\\Documents\\sf250X-thesis\\evaluator\\data"
 val sources: Array[String] = Array(
@@ -20,6 +24,10 @@ val sources: Array[String] = Array(
 
   println("END")
 
-def analyze(graph: ForSyDeSystemGraph): Double =
-  10.1
+def getDoubleProp(a: Vertex, name: String) = a.getProperties().get(name).unwrap().asInstanceOf[Long].toDouble
 
+def analyze(graph: ForSyDeSystemGraph): Double =
+  var actors: Seq[Vertex] = graph.vertexSet().stream()
+      .filter(v => v.getProperties().get("throughputInSecsNumerator") != null)
+      .toList().asScala.toList
+  actors.map(a => getDoubleProp(a, "throughputInSecsNumerator")/getDoubleProp(a, "throughputInSecsDenominator")).min
