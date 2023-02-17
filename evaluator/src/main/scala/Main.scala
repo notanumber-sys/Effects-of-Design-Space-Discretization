@@ -3,7 +3,9 @@ import forsyde.io.java.core.Vertex;
 import forsyde.io.java.drivers.ForSyDeModelHandler;
 import org.antlr.v4.semantics.RuleCollector
 import scala.jdk.CollectionConverters.*;
+
 import breeze.linalg.max
+import forsyde.io.java.core.VertexProperty
 
 val data_root = "C:\\Users\\u087044\\Documents\\sf250X-thesis\\evaluator\\data"
 val sources: Array[String] = Array(
@@ -24,10 +26,20 @@ val sources: Array[String] = Array(
 
   println("END")
 
-def getDoubleProp(a: Vertex, name: String) = a.getProperties().get(name).unwrap().asInstanceOf[Long].toDouble
+def getDoubleProp(a: Vertex, name: String): Option[Double] =
+  var prop: Option[VertexProperty] = a.getProperties().get(name) match
+    case p: VertexProperty => Some(p)
+    case null => None
+  try
+    prop.map(_.unwrap()).map(_.asInstanceOf[Long].toDouble)
+  catch
+    case e: ClassCastException => None
 
-def analyze(graph: ForSyDeSystemGraph): Double =
-  var actors: Seq[Vertex] = graph.vertexSet().stream()
-      .filter(v => v.getProperties().get("throughputInSecsNumerator") != null)
-      .toList().asScala.toList
-  actors.map(a => getDoubleProp(a, "throughputInSecsNumerator")/getDoubleProp(a, "throughputInSecsDenominator")).min
+def getThroughput(a: Vertex): Option[Double] =
+  // if numerator exist, we assume that denominator also exists
+  getDoubleProp(a, "throughputInSecsNumerator").map(_/getDoubleProp(a, "throughputInSecsDenominator").get)
+
+def analyze(graph: ForSyDeSystemGraph): Option[Double] =
+  // finds all actors with throughput property
+  graph.vertexSet().stream().map(getThroughput(_)).filter(_.isDefined).map(_.get)
+      .toList().asScala.reduceLeftOption(_ min _)
