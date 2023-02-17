@@ -1,3 +1,6 @@
+import java.nio.file.Paths
+import java.nio.file.Files
+
 import forsyde.io.java.core.ForSyDeSystemGraph;
 import forsyde.io.java.core.Vertex;
 import forsyde.io.java.drivers.ForSyDeModelHandler;
@@ -6,23 +9,22 @@ import scala.jdk.CollectionConverters.*;
 
 import breeze.linalg.max
 import forsyde.io.java.core.VertexProperty
+import scala.annotation.switch
 
-val data_root = "C:\\Users\\u087044\\Documents\\sf250X-thesis\\evaluator\\data"
-val sources: Array[String] = Array(
-  "all_and_bus_small_result.fiodl",
-  "sobel_and_bus_small_result.fiodl"
-)
-
-@main def hello: Unit = 
+@main def evaluate(args: String*): Unit = 
   println("BEGIN")
-  
-  var handler = ForSyDeModelHandler()
-  for(s <- sources) {
-    var path = data_root + "\\" + s
-    var graph: ForSyDeSystemGraph = handler.loadModel(path)
 
-    println(s + ": " + analyze(graph))
-  }
+  var data_source = args.length match
+    case 0 => Paths.get("data")
+    case _ => Paths.get(args(0))
+  if !Files.isDirectory(data_source) then 
+    println("SELECTED FILE DOES NOT EXIST")
+    return
+
+  var handler = ForSyDeModelHandler()
+  for p <- Files.list(data_source).toList().asScala do
+    val graph: ForSyDeSystemGraph = handler.loadModel(p)
+    println(p.getFileName().toString() + ": " + analyze(graph).get)
 
   println("END")
 
