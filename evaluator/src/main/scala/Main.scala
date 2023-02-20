@@ -2,6 +2,7 @@ package main
 
 import java.nio.file.Paths
 import java.nio.file.Files
+import java.util.stream.Collectors
 
 import forsyde.io.java.core.ForSyDeSystemGraph;
 import forsyde.io.java.core.Vertex;
@@ -24,7 +25,7 @@ import scala.annotation.switch
     return
 
   var handler = ForSyDeModelHandler()
-  for p <- Files.list(data_source).toList().asScala do
+  for p <- Files.list(data_source).collect(Collectors.toList()).asScala do
     val graph: ForSyDeSystemGraph = handler.loadModel(p)
     println(p.getFileName().toString() + ": " + analyze(graph).get)
 
@@ -46,4 +47,4 @@ def getThroughput(a: Vertex): Option[Double] =
 def analyze(graph: ForSyDeSystemGraph): Option[Double] =
   // finds all actors with throughput property
   graph.vertexSet().stream().map(getThroughput(_)).filter(_.isDefined).map(_.get)
-      .toList().asScala.reduceLeftOption(_ min _)
+      .collect(Collectors.toList()).asScala.reduceLeftOption(_ min _)
