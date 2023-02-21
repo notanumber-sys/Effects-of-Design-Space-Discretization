@@ -13,6 +13,7 @@ import scala.jdk.CollectionConverters.*;
 import breeze.linalg.max
 import forsyde.io.java.core.VertexProperty
 import scala.annotation.switch
+import forsyde.io.java.typed.viewers.decision.results.AnalyzedActor
 
 @main def evaluate(args: String*): Unit = 
   println("BEGIN")
@@ -41,8 +42,10 @@ def getDoubleProp(a: Vertex, name: String): Option[Double] =
     case e: ClassCastException => None
 
 def getThroughput(a: Vertex): Option[Double] =
-  // if numerator exist, we assume that denominator also exists
-  getDoubleProp(a, "throughputInSecsNumerator").map(_/getDoubleProp(a, "throughputInSecsDenominator").get)
+  val jopt = AnalyzedActor.safeCast(a).map(al => {
+    al.getThroughputInSecsNumerator().toDouble/al.getThroughputInSecsDenominator().toDouble
+  })
+  if jopt.isPresent() then Some(jopt.get()) else None
 
 def analyze(graph: ForSyDeSystemGraph): Option[Double] =
   // finds all actors with throughput property
