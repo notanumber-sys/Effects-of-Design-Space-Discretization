@@ -28,7 +28,9 @@ then
     exit 1
 fi
 
-model=(*.fiodl)
+shopt -s nullglob
+model=($target/*.fiodl)
+echo "Using model files: ${model[@]}"
 if [ ${#model[@]} -eq 0 ]
 then
    echo "Unable to find any model files!"
@@ -38,7 +40,7 @@ fi
 
 cfg_lines=()
 while read line; do
-    cfg_lines+=($line)
+    cfg_lines+=("$line")
 done < "$analysis_config"
 if [ ${#cfg_lines[@]} -lt 2 ]
 then
@@ -47,8 +49,8 @@ then
     exit 1
 fi
 
-spa_muls=($cfg_lines[0])
-mem_divs=($cfg_lines[1])
+spa_muls=(${cfg_lines[0]})
+mem_divs=(${cfg_lines[1]})
 if [[ ${#spa_muls[@]} -eq 0 || ${#mem_divs[@]} -eq 0 ]]
 then
     echo "Invalid configuratio file!"
@@ -56,12 +58,10 @@ then
     exit 1
 fi
 
-# we are ready to run
-echo "RUNNING TESTS..."
 solution_dir="so_case_$identifier"
 if [ -d $solution_dir ]
 then
-    read -p "Warning! A solution already exists! Override old case? " -n 1 -r
+    read -p "Warning! A solution already exists! Override old case [yY to confirm]? " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]
     then
@@ -74,12 +74,15 @@ then
     fi
 fi	
 
-if mkdir $solution_dir
+if ! mkdir $solution_dir
 then
     echo "Failed to create solution directory!"
     echo "    ABORTING!"
     exit 1
 fi
+
+# we are ready to run
+echo "RUNNING TESTS..."
 
 outfile=$solution_dir/idesyde.out
 touch $outfile
@@ -87,9 +90,9 @@ for sm in ${spa_muls[@]}
 do
     for md in ${mem_divs[@]}
     do
-	out_name=$sm_$md.fiodl
-	echo "Running sm=$sm, md=$md..."
-	java -jar cli-assembly-0.3.4.jar --time-multiplier $sm --memory-divider $md -o $out_name ${model[@]} >> $outfile
+	out_name="${sm}_${md}.fiodl"
+	echo "Running sm=$sm, md=$md... -> $out_name"
+	java -jar cli-assembly-0.3.4.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile
     done
 done
 
