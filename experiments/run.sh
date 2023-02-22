@@ -83,16 +83,19 @@ fi
 
 # we are ready to run
 echo "RUNNING TESTS..."
+TIMEFORMAT="%R"
 
 outfile=$solution_dir/idesyde.out
+timesfile=$solution_dir/times
 touch $outfile
+touch $timesfile
 for sm in ${spa_muls[@]}
 do
     for md in ${mem_divs[@]}
     do
 	out_name="${sm}_${md}.fiodl"
 	echo "Running sm=$sm, md=$md... -> $out_name"
-	java -jar cli-assembly-0.3.4.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile
+	{ time java -jar cli-assembly-0.3.4.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>> $timesfile
     done
 done
 
