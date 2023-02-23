@@ -95,7 +95,7 @@ do
     do
 	out_name="${sm}_${md}.fiodl"
 	echo "Running sm=$sm, md=$md... -> $out_name"
-	{ time java -jar cli-assembly-0.3.4.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>> $timesfile
+	{ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>> $timesfile
     done
 done
 
