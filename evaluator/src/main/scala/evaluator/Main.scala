@@ -1,4 +1,4 @@
-package main
+package evaluator
 
 import java.nio.file.Paths
 import java.nio.file.Files
@@ -15,8 +15,8 @@ import forsyde.io.java.core.VertexProperty
 import scala.annotation.switch
 import forsyde.io.java.typed.viewers.decision.results.AnalyzedActor
 
-@main def evaluate(args: String*): Unit = 
-  println("BEGIN")
+def evaluate(args: Seq[String]): Unit = 
+  //println("BEGIN")
 
   var data_source = args.length match
     case 0 => Paths.get("data")
@@ -27,10 +27,14 @@ import forsyde.io.java.typed.viewers.decision.results.AnalyzedActor
 
   var handler = ForSyDeModelHandler()
   for p <- Files.list(data_source).collect(Collectors.toList()).asScala do
-    val graph: ForSyDeSystemGraph = handler.loadModel(p)
-    println(p.getFileName().toString() + " " + analyze(graph).get)
+    if p.getFileName().toString.split("\\.").last.equals("fiodl") then
+      val graph: ForSyDeSystemGraph = handler.loadModel(p)
+      println(p.getFileName().toString() + "," + analyze(graph).get)
 
-  println("END")
+  //println("END")
+
+object Main:
+  def main(args: Array[String]): Unit = evaluate(args)
 
 class AnalysisResult(
       numericalThroughput: Option[Double],
@@ -38,7 +42,7 @@ class AnalysisResult(
   def numThroughput = if numericalThroughput.isDefined then numericalThroughput.get else Double.NaN
   def exaThroughput = if exactThroughput.isDefined then exactThroughput.get else Double.NaN
   override def toString(): String =
-    numThroughput + " " + exactThroughput
+    numThroughput + "," + exactThroughput
 
 def getDoubleProp(a: Vertex, name: String): Option[Double] =
   var prop: Option[VertexProperty] = a.getProperties().get(name) match
