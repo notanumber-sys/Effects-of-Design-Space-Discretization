@@ -14,23 +14,56 @@ import breeze.linalg.max
 import forsyde.io.java.core.VertexProperty
 import scala.annotation.switch
 import forsyde.io.java.typed.viewers.decision.results.AnalyzedActor
+import java.nio.file.Path
+import scala.io.Source
 
 def evaluate(args: Seq[String]): Unit = 
   //println("BEGIN")
 
-  var data_source = args.length match
+  val identifier = args.length match
     case 0 => Paths.get("data")
     case _ => Paths.get(args(0))
+  val data_source = Paths.get(s"so_case_${identifier}")
+  val config_source = Paths.get(s"in_case_${identifier}/config")
+  val times_source = Paths.get(s"so_case_${identifier}/times")
   if !Files.isDirectory(data_source) then 
-    println("SELECTED FILE DOES NOT EXIST")
+    println("SELECTED DIRECTORY DOES NOT EXIST")
+    return
+  if !Files.exists(config_source) then
+    println("CONFIG FILE COULD NOT BE FOUND")
     return
 
+  val case_descr = Source.fromFile(config_source.toString)
+  val config = case_descr.getLines.toList
+  val tss = config(0).split(" ").map(_.toLong)
+  val mds = config(1).split(" ").map(_.toLong)
+  case_descr.close()
+
+  val times_file = Source.fromFile(times_source.toString)
+  val times = times_file.getLines.toList.filter(_.length() > 0).map(_.toDouble)
+  times_file.close()
+  if times.length != tss.length*mds.length then
+    print("Incorrect times format!")
+    return
+  
   var handler = ForSyDeModelHandler()
+  var counter = 0
+  for
+    ts <- tss
+    md <- mds
+  do
+    val instance = Paths.get(s"so_case_${identifier}/${ts}_${md}.fiodl")
+    if Files.exists(instance) then
+      val graph: ForSyDeSystemGraph = handler.loadModel(instance)
+      println(s"${ts},${md},${analyze(graph).get},${times(counter)}")
+      counter += 1
+
+      /*
   for p <- Files.list(data_source).collect(Collectors.toList()).asScala do
     if p.getFileName().toString.split("\\.").last.equals("fiodl") then
       val graph: ForSyDeSystemGraph = handler.loadModel(p)
       println(p.getFileName().toString() + "," + analyze(graph).get)
-
+*/
   //println("END")
 
 object Main:
