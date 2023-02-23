@@ -100,7 +100,9 @@ do
 done
 
 echo "SOLUTIONS DONE!"
+echo "EVALUATING SOLUTIONS..."
 
-
+resultfile=out_case_${identifier}.csv
+java -cp evaluator.jar evaluator.Main $solution_dir > $resultfile
 
 echo "DONE!"
