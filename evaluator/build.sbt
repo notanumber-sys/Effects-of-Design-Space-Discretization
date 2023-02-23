@@ -6,6 +6,11 @@ lazy val scribeVersion     = "3.10.2"
 lazy val breezeVersion     = "2.1.0"
 lazy val scalaGraphVersion = "1.13.5"
 
+ThisBuild / assembly / assemblyMergeStrategy := {
+  case PathList("META_INF", xs @ _*) => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}
+
 lazy val root = project
   .in(file("."))
   .settings(
@@ -13,6 +18,9 @@ lazy val root = project
     version := "0.1.0-SNAPSHOT",
 
     scalaVersion := scala3Version,
+
+    Compile / mainClass := Some("evaluator.Main"),
+    assembly / assemblyJarName := "evaluator.jar",
 
     libraryDependencies ++= Seq(
       ("org.scala-graph" %% "graph-core"   % scalaGraphVersion).cross(CrossVersion.for3Use2_13),
@@ -30,3 +38,4 @@ lazy val root = project
       "org.typelevel"    %% "spire"                % "0.18.0"
     )
   )
+
