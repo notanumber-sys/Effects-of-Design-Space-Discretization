@@ -7,7 +7,7 @@ echo "READING TEST CONFIGURATION..."
 if [ "$#" -eq 0 ]
 then
     echo "No arguments supplied!"
-    echo "    Please specify target directory"
+    echo "    Please specify the target case identifier"
     exit 1
 fi
 
@@ -26,6 +26,20 @@ then
     echo "Unable to find case configuration!"
     echo "    $analysis_config is not a file."
     exit 1
+fi
+
+nreps=1
+if [ "$#" -eq 2 ]
+then
+    if [[ $2 =~ ^[0-9]+$ ]]
+    then
+        nreps=$2
+        echo "Repetitions set to $nreps"
+    else
+	echo "Failed to set repetitions!"
+	echo "    $2 is not a number!"
+	echo "    Continuing with repetitions=$repetitions"
+    fi
 fi
 
 shopt -s nullglob
@@ -94,8 +108,13 @@ do
     for md in ${mem_divs[@]}
     do
 	out_name="${sm}_${md}.fiodl"
-	echo "Running sm=$sm, md=$md... -> $out_name"
-	{ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>> $timesfile
+	echo "Running sm=$sm, md=$md"
+	times_buff=()
+	for (( c=1; c<=$nreps; c++ ))
+	do
+	    times_buff+=($({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>&1))
+	done
+	echo "${times_buff[@]}" >> $timesfile
     done
 done
 

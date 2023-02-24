@@ -40,7 +40,8 @@ def evaluate(args: Seq[String]): Unit =
   case_descr.close()
 
   val times_file = Source.fromFile(times_source.toString)
-  val times = times_file.getLines.toList.filter(_.length() > 0).map(_.toDouble)
+  val times = times_file.getLines.toList.filter(_.length() > 0)
+      .map(_.split(" ").map(_.toDouble)).map(x => x.sum/x.length)
   times_file.close()
   if times.length != tss.length*mds.length then
     print("Incorrect times format!")
