@@ -105,4 +105,9 @@ echo "EVALUATING SOLUTIONS..."
 resultfile=out_case_${identifier}.csv
 java -cp evaluator.jar evaluator.Main $identifier > $resultfile
 
+echo "EVALUATION DONE!"
+echo "GENERATING PLOTS..."
+
+bash plotter.jl $identifier
+
 echo "DONE!"
