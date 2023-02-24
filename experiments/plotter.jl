@@ -15,7 +15,7 @@ function read_data(path::String)
     data = CSV.File(path)
     M = 1
     p = data[1][1]
-    while data[M][1] == p && M < length(data)
+    while M <= length(data) && data[M][1] == p
         M += 1
     end
     M -= 1
