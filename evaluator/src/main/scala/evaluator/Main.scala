@@ -46,6 +46,7 @@ def evaluate(args: Seq[String]): Unit =
     print("Incorrect times format!")
     return
   
+  println("time_mult,mem_div,n_through,e_through,time")
   var handler = ForSyDeModelHandler()
   var counter = 0
   for
@@ -75,7 +76,7 @@ class AnalysisResult(
   def numThroughput = if numericalThroughput.isDefined then numericalThroughput.get else Double.NaN
   def exaThroughput = if exactThroughput.isDefined then exactThroughput.get else Double.NaN
   override def toString(): String =
-    numThroughput + "," + exactThroughput
+    s"${numThroughput},${exactThroughput}"
 
 def getDoubleProp(a: Vertex, name: String): Option[Double] =
   var prop: Option[VertexProperty] = a.getProperties().get(name) match
