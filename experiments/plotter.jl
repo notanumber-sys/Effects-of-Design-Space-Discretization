@@ -33,11 +33,11 @@ function plot_th_by_time_mult()
         mark=:circle,
         legend=:bottomright
     )
-    for n in 2:M
+    for m in 2:M
         plot!(p,
-            data["time_mult"][n:M:end],
-            data["n_through"][n:M:end],
-            label=@sprintf("Disc Th., md=%d", data["mem_div"][n]),
+            data["time_mult"][m:M:end],
+            data["n_through"][m:M:end],
+            label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
             mark=:circle
         )
     end
@@ -56,12 +56,12 @@ function plot_errest_by_time_mult()
         mark=:circle,
         legend=:topright
     )
-    for n in 2:M
-        vals = correct.-data["n_through"][n:M:end]
+    for m in 2:M
+        vals = correct.-data["n_through"][m:M:end]
         plot!(p,
-            data["time_mult"][n:M:end][vals.>0],
+            data["time_mult"][m:M:end][vals.>0],
             vals[vals.>0],
-            label=@sprintf("Disc Th., md=%d", data["mem_div"][n]),
+            label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
             mark=:circle
         )
     end
@@ -78,15 +78,81 @@ function plot_time_by_time_mult()
         mark=:circle,
         legend=:bottomright
     )
-    for n in 2:M
+    for m in 2:M
         plot!(p,
-            data["time_mult"][n:M:end],
-            data["time"][n:M:end],
-            label=@sprintf("Disc Th., md=%d", data["mem_div"][n]),
+            data["time_mult"][m:M:end],
+            data["time"][m:M:end],
+            label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
             mark=:circle
         )
     end
     savefig(p, @sprintf("%s/t_vs_tm.png", plotsdir))
+end
+
+function plot_th_by_mem_div()
+    p = plot(
+        data["mem_div"][1:M],
+        data["n_through"][1:M],
+        xaxis=("memory divider", :log10),
+        yaxis=("throughput"),
+        label=@sprintf("Disc Th., tm=%d", data["time_mult"][1]),
+        mark=:circle,
+        legend=:bottomright
+    )
+    for n in 2:N
+        plot!(p,
+            data["mem_div"][M*(n-1)+1:M*n],
+            data["n_through"][M*(n-1)+1:M*n],
+            label=@sprintf("Disc Th., tm=%d", data["time_mult"][n*M]),
+            mark=:circle
+        )
+    end
+    savefig(p, @sprintf("%s/th_vs_md.png", plotsdir))
+end
+
+function plot_errest_by_mem_div()
+    correct = data["n_through"][end]  # TODO: Update this to more exact e_through
+    vals = correct.-data["n_through"][1:M]
+    p = plot(
+        data["mem_div"][1:M][vals.>0],
+        vals[vals.>0],
+        xaxis=("memory divider", :log10),
+        yaxis=("error estimate", :log10),
+        label=@sprintf("Disc Th., tm=%d", data["time_mult"][1]),
+        mark=:circle,
+        legend=:topright
+    )
+    for n in 2:N
+        vals = correct.-data["n_through"][M*(n-1)+1:M*n]
+        plot!(p,
+            data["time_mult"][M*(n-1)+1:M*n][vals.>0],
+            vals[vals.>0],
+            label=@sprintf("Disc Th., tm=%d", data["time_mult"][n*M]),
+            mark=:circle
+        )
+    end
+    savefig(p, @sprintf("%s/err_vs_md.png", plotsdir))
+end
+
+function plot_time_by_mem_div()
+    p = plot(
+        data["mem_div"][1:M],
+        data["time"][1:M],
+        xaxis=("memory divider", :log10),
+        yaxis=("run time"),
+        label=@sprintf("Disc Th., tm=%d", data["time_mult"][1]),
+        mark=:circle,
+        legend=:bottomright
+    )
+    for n in 2:N
+        plot!(p,
+            data["mem_div"][M*(n-1)+1:M*n],
+            data["time"][M*(n-1)+1:M*n],
+            label=@sprintf("Disc Th., tm=%d", data["time_mult"][n*M]),
+            mark=:circle
+        )
+    end
+    savefig(p, @sprintf("%s/t_vs_md.png", plotsdir))
 end
 
 function plot_errest_by_time()
@@ -102,12 +168,12 @@ function plot_errest_by_time()
         mark=:circle,
         legend=:topright
     )
-    for n in 2:M
-        vals = correct.-data["n_through"][n:M:end]
+    for m in 2:M
+        vals = correct.-data["n_through"][m:M:end]
         plot!(p,
-            data["time"][n:M:end][vals.>0],
+            data["time"][m:M:end][vals.>0],
             vals[vals.>0],
-            label=@sprintf("Disc Th., md=%d", data["mem_div"][n]),
+            label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
             seriestype=:scatter,
             mark=:circle
         )
@@ -126,7 +192,12 @@ plotsdir = @sprintf("plt_case_%s", identifier)
 data, N, M = read_data(target)
 rm(plotsdir, force=true, recursive=true)
 mkdir(plotsdir)
+
+# make plots
 plot_th_by_time_mult()
 plot_errest_by_time_mult()
 plot_time_by_time_mult()
+plot_th_by_mem_div()
+plot_errest_by_mem_div()
+plot_time_by_mem_div()
 plot_errest_by_time()
