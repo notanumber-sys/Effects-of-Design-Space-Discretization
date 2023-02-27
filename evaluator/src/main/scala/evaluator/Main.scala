@@ -16,6 +16,23 @@ import scala.annotation.switch
 import forsyde.io.java.typed.viewers.decision.results.AnalyzedActor
 import java.nio.file.Path
 import scala.io.Source
+import algebra.lattice.Bool
+
+/**
+  * Standard median function for fractional types.
+  *
+  * @param vals a list of doubles.
+  * @return The median of the values in the list, or None in case of an empty list.
+  */
+def median[T : Fractional](vals: Seq[T])(implicit n: Fractional[T], ord: Ordering[T]): Option[T] =
+  if vals.length == 0 then return None
+  val sorted = vals.sortBy(x => x)(ord)
+  import n.mkNumericOps
+  Some(
+    sorted.length%2 match
+      case 1 => sorted(sorted.length/2 + 1)
+      case 0 => (sorted(sorted.length/2) + sorted(sorted.length/2 + 1))/((2.0).asInstanceOf[T])
+  )
 
 def evaluate(args: Seq[String]): Unit = 
   //println("BEGIN")
@@ -41,7 +58,7 @@ def evaluate(args: Seq[String]): Unit =
 
   val times_file = Source.fromFile(times_source.toString)
   val times = times_file.getLines.toList.filter(_.length() > 0)
-      .map(_.split(" ").map(_.toDouble)).map(x => x.sum/x.length)
+      .map(_.split(" ").map(_.toDouble)).map(median(_)).map(_.get)
   times_file.close()
   if times.length != tss.length*mds.length then
     print("Incorrect times format!")
