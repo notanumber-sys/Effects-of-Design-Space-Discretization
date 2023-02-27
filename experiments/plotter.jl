@@ -36,6 +36,7 @@ function plot_th_by_time_mult()
         data["n_through"][1:M:end],
         xaxis=("time multiplier", :log10),
         yaxis=("throughput"),
+        title=@sprintf("Th vs. tm; case: %s", identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
         mark=:circle,
         legend=:bottomright
@@ -59,6 +60,7 @@ function plot_errest_by_time_mult()
         vals[vals.>0],
         xaxis=("time multiplier", :log10),
         yaxis=("error estimate", :log10),
+        title=@sprintf("Error estimate vs. tm; case: %s", identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
         mark=:circle,
         legend=:topright
@@ -81,6 +83,7 @@ function plot_time_by_time_mult()
         data["time"][1:M:end],
         xaxis=("time multiplier", :log10),
         yaxis=("run time"),
+        title=@sprintf("Median time vs. tm; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
         mark=:circle,
         legend=:bottomright
@@ -102,6 +105,7 @@ function plot_th_by_mem_div()
         data["n_through"][1:M],
         xaxis=("memory divider", :log10),
         yaxis=("throughput"),
+        title=@sprintf("Th vs. md; case: %s", identifier),
         label=@sprintf("Disc Th., tm=%d", data["time_mult"][1]),
         mark=:circle,
         legend=:bottomright
@@ -125,6 +129,7 @@ function plot_errest_by_mem_div()
         vals[vals.>0],
         xaxis=("memory divider", :log10),
         yaxis=("error estimate", :log10),
+        title=@sprintf("Error estimate vs. md; case: %s", identifier),
         label=@sprintf("Disc Th., tm=%d", data["time_mult"][1]),
         mark=:circle,
         legend=:topright
@@ -147,6 +152,7 @@ function plot_time_by_mem_div()
         data["time"][1:M],
         xaxis=("memory divider", :log10),
         yaxis=("run time"),
+        title=@sprintf("Median time vs. md; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., tm=%d", data["time_mult"][1]),
         mark=:circle,
         legend=:bottomright
@@ -170,6 +176,7 @@ function plot_errest_by_time()
         vals[vals.>0],
         xaxis=("time [s]"),
         yaxis=("error estimate", :log10),
+        title=@sprintf("Error est. vs. median time; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
         seriestype=:scatter,
         mark=:circle,
