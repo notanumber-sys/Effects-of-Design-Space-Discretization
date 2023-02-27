@@ -30,8 +30,8 @@ def median[T : Fractional](vals: Seq[T])(implicit n: Fractional[T], ord: Orderin
   import n.mkNumericOps
   Some(
     sorted.length%2 match
-      case 1 => sorted(sorted.length/2 + 1)
-      case 0 => (sorted(sorted.length/2) + sorted(sorted.length/2 + 1))/((2.0).asInstanceOf[T])
+      case 1 => sorted(sorted.length/2)
+      case 0 => (sorted(sorted.length/2 - 1) + sorted(sorted.length/2))/((2.0).asInstanceOf[T])
   )
 
 def evaluate(args: Seq[String]): Unit = 
@@ -58,13 +58,13 @@ def evaluate(args: Seq[String]): Unit =
 
   val times_file = Source.fromFile(times_source.toString)
   val times = times_file.getLines.toList.filter(_.length() > 0)
-      .map(_.split(" ").map(_.toDouble)).map(median(_)).map(_.get)
+      .map(_.split(" ").map(_.toDouble)).map(x => (median(x).get, x.length))
   times_file.close()
   if times.length != tss.length*mds.length then
     print("Incorrect times format!")
     return
   
-  println("time_mult,mem_div,n_through,e_through,time")
+  println("time_mult,mem_div,n_through,e_through,time,batch_size")
   var handler = ForSyDeModelHandler()
   var counter = 0
   for
@@ -74,7 +74,7 @@ def evaluate(args: Seq[String]): Unit =
     val instance = Paths.get(s"so_case_${identifier}/${ts}_${md}.fiodl")
     if Files.exists(instance) then
       val graph: ForSyDeSystemGraph = handler.loadModel(instance)
-      println(s"${ts},${md},${analyze(graph).get},${times(counter)}")
+      println(s"${ts},${md},${analyze(graph).get},${times(counter)(0)},${times(counter)(1)}")
       counter += 1
 
       /*
