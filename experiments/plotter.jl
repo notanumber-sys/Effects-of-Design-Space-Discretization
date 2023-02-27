@@ -10,6 +10,7 @@ using LinearAlgebra
 
 # mode if program is run as script
 mode = abspath(PROGRAM_FILE) == @__FILE__
+formats = ["png", "svg"]
 
 function read_data(path::String)
     data = CSV.File(path)
@@ -21,6 +22,12 @@ function read_data(path::String)
     M -= 1
     N = Int(length(data)/M)
     return data, N, M
+end
+
+function savefigs(p, plotname)
+    for format in formats
+        savefig(p, @sprintf("%s/%s/%s.%s", plotsdir, format, plotname, format))
+    end
 end
 
 function plot_th_by_time_mult()
@@ -41,7 +48,7 @@ function plot_th_by_time_mult()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/th_vs_tm.png", plotsdir))
+    savefigs(p, "th_vs_tm")
 end
 
 function plot_errest_by_time_mult()
@@ -65,7 +72,7 @@ function plot_errest_by_time_mult()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/err_vs_tm.png", plotsdir))
+    savefigs(p, "err_vs_tm")
 end
 
 function plot_time_by_time_mult()
@@ -86,7 +93,7 @@ function plot_time_by_time_mult()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/t_vs_tm.png", plotsdir))
+    savefigs(p, "t_vs_tm")
 end
 
 function plot_th_by_mem_div()
@@ -107,7 +114,7 @@ function plot_th_by_mem_div()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/th_vs_md.png", plotsdir))
+    savefigs(p, "th_vs_md")
 end
 
 function plot_errest_by_mem_div()
@@ -131,7 +138,7 @@ function plot_errest_by_mem_div()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/err_vs_md.png", plotsdir))
+    savefigs(p, "err_vs_md")
 end
 
 function plot_time_by_mem_div()
@@ -152,7 +159,7 @@ function plot_time_by_mem_div()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/t_vs_md.png", plotsdir))
+    savefigs(p, "t_vs_md")
 end
 
 function plot_errest_by_time()
@@ -178,7 +185,7 @@ function plot_errest_by_time()
             mark=:circle
         )
     end
-    savefig(p, @sprintf("%s/err_vs_t.png", plotsdir))
+    savefigs(p, "err_vs_t.png")
 end
 
 # determine target
@@ -192,6 +199,9 @@ plotsdir = @sprintf("plt_case_%s", identifier)
 data, N, M = read_data(target)
 rm(plotsdir, force=true, recursive=true)
 mkdir(plotsdir)
+for format in formats
+    mkdir(@sprintf("%s/%s", plotsdir, format))
+end
 
 # make plots
 plot_th_by_time_mult()
