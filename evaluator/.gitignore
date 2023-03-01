@@ -6,3 +6,5 @@ target/
 .vscode/
 project/
 data/
+in_case_test/
+so_case_test/
