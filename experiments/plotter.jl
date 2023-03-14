@@ -195,6 +195,70 @@ function plot_errest_by_time(data, N, M)
     savefigs(p, "err_vs_t.png")
 end
 
+function plot_th_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
+    p = plot(
+        data1["time_mult"][1:M1:end],
+        data1["n_through"][1:M1:end],
+        xaxis=("time multiplier", :log10),
+        yaxis=("throughput"),
+        title=@sprintf("Th vs. tm comp; case: %s, %s", identifier, identifier2),
+        label=@sprintf("Disc Th., %s, md=%d", identifier, data1["mem_div"][1]),
+        mark=:circle,
+        legend=:bottomright
+    )
+    for m in 2:M1
+        plot!(p,
+            data1["time_mult"][m:M1:end],
+            data1["n_through"][m:M1:end],
+            label=@sprintf("Disc Th., %s, md=%d", identifier, data1["mem_div"][m]),
+            mark=:circle
+        )
+    end
+    for m in 1:M2
+        plot!(p,
+            data2["time_mult"][m:M2:end],
+            data2["n_through"][m:M2:end],
+            label=@sprintf("Disc Th., %s, md=%d", identifier2, data2["mem_div"][m]),
+            mark=:none
+        )
+    end
+    savefigs(p, "th_vs_tm")
+end
+
+function plot_errest_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
+    correct = data1["n_through"][end]  # TODO: Update this to more exact e_through
+    vals1 = correct.-data1["n_through"][1:M1:end]
+    p = plot(
+        data1["time_mult"][1:M1:end][vals1.>0],
+        vals1[vals1.>0],
+        xaxis=("time multiplier", :log10),
+        yaxis=("error estimate", :log10),
+        title=@sprintf("Error estimate vs. tm comp; case: %s, %s", identifier, identifier2),
+        label=@sprintf("Disc Th., %s, md=%d", identifier, data1["mem_div"][1]),
+        mark=:circle,
+        legend=:topright
+    )
+    for m in 2:M1
+        vals1 = correct.-data1["n_through"][m:M1:end]
+        plot!(p,
+            data1["time_mult"][m:M1:end][vals1.>0],
+            vals1[vals1.>0],
+            label=@sprintf("Disc Th., %s, md=%d", identifier, data1["mem_div"][m]),
+            mark=:circle
+        )
+    end
+    for m in 1:M2
+        vals2 = correct.-data2["n_through"][m:M2:end]
+        plot!(p,
+            data2["time_mult"][m:M2:end][vals2.>0],
+            vals2[vals2.>0],
+            label=@sprintf("Disc Th., %s, md=%d", identifier2, data2["mem_div"][m]),
+            mark=:none
+        )
+    end
+    savefigs(p, "err_vs_tm")
+end
+
 function load_data(identifier)
     target = @sprintf("out_case_%s.csv", identifier)
     data, N, M = read_data(target)
@@ -231,7 +295,8 @@ function double_analysis(identifier_sparse, identifier_dense)
     end
 
     # make plots
-
+    plot_th_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
+    plot_errest_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
 end
 
 # determine target
