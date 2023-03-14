@@ -30,7 +30,7 @@ function savefigs(p, plotname)
     end
 end
 
-function plot_th_by_time_mult()
+function plot_th_by_time_mult(data, N, M)
     p = plot(
         data["time_mult"][1:M:end],
         data["n_through"][1:M:end],
@@ -38,7 +38,7 @@ function plot_th_by_time_mult()
         yaxis=("throughput"),
         title=@sprintf("Th vs. tm; case: %s", identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
-        mark=:circle,
+        mark=(N>100 ? :none : :circle),
         legend=:bottomright
     )
     for m in 2:M
@@ -46,13 +46,13 @@ function plot_th_by_time_mult()
             data["time_mult"][m:M:end],
             data["n_through"][m:M:end],
             label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
-            mark=:circle
+            mark=(N>100 ? :none : :circle)
         )
     end
     savefigs(p, "th_vs_tm")
 end
 
-function plot_errest_by_time_mult()
+function plot_errest_by_time_mult(data, N, M)
     correct = data["n_through"][end]  # TODO: Update this to more exact e_through
     vals = correct.-data["n_through"][1:M:end]
     p = plot(
@@ -62,7 +62,7 @@ function plot_errest_by_time_mult()
         yaxis=("error estimate", :log10),
         title=@sprintf("Error estimate vs. tm; case: %s", identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
-        mark=:circle,
+        mark=(N>100 ? :none : :circle),
         legend=:topright
     )
     for m in 2:M
@@ -71,13 +71,13 @@ function plot_errest_by_time_mult()
             data["time_mult"][m:M:end][vals.>0],
             vals[vals.>0],
             label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
-            mark=:circle
+            mark=(N>100 ? :none : :circle)
         )
     end
     savefigs(p, "err_vs_tm")
 end
 
-function plot_time_by_time_mult()
+function plot_time_by_time_mult(data, N, M)
     p = plot(
         data["time_mult"][1:M:end],
         data["time"][1:M:end],
@@ -85,7 +85,7 @@ function plot_time_by_time_mult()
         yaxis=("run time"),
         title=@sprintf("Median time vs. tm; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
-        mark=:circle,
+        mark=(N>100 ? :none : :circle),
         legend=:bottomright
     )
     for m in 2:M
@@ -93,13 +93,13 @@ function plot_time_by_time_mult()
             data["time_mult"][m:M:end],
             data["time"][m:M:end],
             label=@sprintf("Disc Th., md=%d", data["mem_div"][m]),
-            mark=:circle
+            mark=(N>100 ? :none : :circle)
         )
     end
     savefigs(p, "t_vs_tm")
 end
 
-function plot_th_by_mem_div()
+function plot_th_by_mem_div(data, N, M)
     p = plot(
         data["mem_div"][1:M],
         data["n_through"][1:M],
@@ -121,7 +121,7 @@ function plot_th_by_mem_div()
     savefigs(p, "th_vs_md")
 end
 
-function plot_errest_by_mem_div()
+function plot_errest_by_mem_div(data, N, M)
     correct = data["n_through"][end]  # TODO: Update this to more exact e_through
     vals = correct.-data["n_through"][1:M]
     p = plot(
@@ -146,7 +146,7 @@ function plot_errest_by_mem_div()
     savefigs(p, "err_vs_md")
 end
 
-function plot_time_by_mem_div()
+function plot_time_by_mem_div(data, N, M)
     p = plot(
         data["mem_div"][1:M],
         data["time"][1:M],
@@ -168,7 +168,7 @@ function plot_time_by_mem_div()
     savefigs(p, "t_vs_md")
 end
 
-function plot_errest_by_time()
+function plot_errest_by_time(data, N, M)
     correct = data["n_through"][end]  # TODO: Update this to more exact e_through
     vals = correct.-data["n_through"][1:M:end]
     p = plot(
@@ -195,26 +195,63 @@ function plot_errest_by_time()
     savefigs(p, "err_vs_t.png")
 end
 
+function load_data(identifier)
+    target = @sprintf("out_case_%s.csv", identifier)
+    data, N, M = read_data(target)
+    return data, N, M
+end
+
+function single_analysis(identifier)
+    global plotsdir = @sprintf("plt_case_%s", identifier)
+    data, N, M = load_data(identifier)
+    rm(plotsdir, force=true, recursive=true)
+    mkdir(plotsdir)
+    for format in formats
+        mkdir(@sprintf("%s/%s", plotsdir, format))
+    end
+    
+    # make plots
+    plot_th_by_time_mult(data, N, M)
+    plot_errest_by_time_mult(data, N, M)
+    plot_time_by_time_mult(data, N, M)
+    plot_th_by_mem_div(data, N, M)
+    plot_errest_by_mem_div(data, N, M)
+    plot_time_by_mem_div(data, N, M)
+    plot_errest_by_time(data, N, M)    
+end
+
+function double_analysis(identifier_sparse, identifier_dense)
+    global plotsdir = @sprintf("plt_dcase_%s_%s", identifier_sparse, identifier_dense)
+    data1, N1, M1 = load_data(identifier_sparse)
+    data2, N2, M2 = load_data(identifier_dense)
+    rm(plotsdir, force=true, recursive=true)
+    mkdir(plotsdir)
+    for format in formats
+        mkdir(@sprintf("%s/%s", plotsdir, format))
+    end
+
+    # make plots
+
+end
+
 # determine target
 identifier = "test"
+identifier2 = nothing
 if mode
-    global identifier = strip(ARGS[1])
+    if length(ARGS) == 1
+        global identifier = strip(ARGS[1])
+    elseif length(ARGS) == 2
+        global identifier = strip(ARGS[1])
+        global identifier2 = strip(ARGS[2])
+    else
+        @printf("Invalid arguments!\n")
+        @printf("    Please specify one or two target identifiers.\n")
+        exit(0)
+    end
 end
-target = @sprintf("out_case_%s.csv", identifier)
-plotsdir = @sprintf("plt_case_%s", identifier)
 
-data, N, M = read_data(target)
-rm(plotsdir, force=true, recursive=true)
-mkdir(plotsdir)
-for format in formats
-    mkdir(@sprintf("%s/%s", plotsdir, format))
+if isnothing(identifier2)
+    single_analysis(identifier)
+else
+    double_analysis(identifier, identifier2)
 end
-
-# make plots
-plot_th_by_time_mult()
-plot_errest_by_time_mult()
-plot_time_by_time_mult()
-plot_th_by_mem_div()
-plot_errest_by_mem_div()
-plot_time_by_mem_div()
-plot_errest_by_time()
