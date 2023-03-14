@@ -29,7 +29,7 @@ then
 fi
 
 nreps=1
-if [ "$#" -eq 2 ]
+if [ "$#" -gt 1 ]
 then
     if [[ $2 =~ ^[0-9]+$ ]]
     then
@@ -38,8 +38,15 @@ then
     else
 	echo "Failed to set repetitions!"
 	echo "    $2 is not a number!"
-	echo "    Continuing with repetitions=$repetitions"
+	echo "    Continuing with repetitions=$nreps"
     fi
+fi
+
+stopearly=0
+if [ "$#" -eq 3 ]
+then
+    stopearly=1
+    echo "Script will not generate any plots."
 fi
 
 shopt -s nullglob
@@ -98,6 +105,7 @@ fi
 # we are ready to run
 echo "RUNNING TESTS..."
 TIMEFORMAT="%R"
+LC_NUMERIC="en_US.UTF-8"
 
 outfile=$solution_dir/idesyde.out
 timesfile=$solution_dir/times
@@ -125,6 +133,13 @@ resultfile=out_case_${identifier}.csv
 java -cp evaluator.jar evaluator.Main $identifier > $resultfile
 
 echo "EVALUATION DONE!"
+
+if [ $stopearly -eq 1 ]
+then
+    echo "DONE! (ignoring plots)"
+    exit 0
+fi
+
 echo "GENERATING PLOTS..."
 
 bash plotter.jl $identifier
