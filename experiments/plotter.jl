@@ -36,10 +36,12 @@ function bound_estimator(x, a, f)
 end
 
 function bound_estimator_factory(data, N)
-    k = data["n_through"][1]/data["time_mult"][1]
-    a = Int(round(data["n_through"][end]/k))
-    f = x -> a*x
-    return (x -> bound_estimator(x, a, f)), (x -> f(x/(x + a))), a
+    #k = data["n_through"][1]/data["time_mult"][1]   # slope
+    k = 1
+    a = Int(round(data["n_through"][end]/k))        # range of linearity
+    f = x -> a*x                                    # identity
+    #          throughput estimate            monotonous bound
+    return (x -> bound_estimator(x, a, f)), (x -> f(x/(x + a)))
 end
 
 function plot_th_by_time_mult(data, N, M)
@@ -65,7 +67,7 @@ function plot_th_by_time_mult(data, N, M)
 end
 
 function plot_th_by_time_mult_analysis(data, N, M)
-    be, le, a = bound_estimator_factory(data, N)
+    be, le = bound_estimator_factory(data, N)
     p = plot(
         data["time_mult"][1:M:end],
         be.(data["time_mult"][1:M:end]),
@@ -90,7 +92,7 @@ function plot_th_by_time_mult_analysis(data, N, M)
     )
     plot!(p,
         data["time_mult"][1:M:end],
-        ones(N).*a,
+        ones(N).*data["n_through"][end],
         label=@sprintf("upper bound"),
         linestyle=:dash
     )
@@ -123,7 +125,7 @@ function plot_errest_by_time_mult(data, N, M)
 end
 
 function plot_errest_by_time_mult_analysis(data, N, M)
-    be, le, a = bound_estimator_factory(data, N)
+    be, le = bound_estimator_factory(data, N)
     correct = data["n_through"][end]
     vals = correct.-data["n_through"][1:M:end]
     bvals = correct.-be.(data["time_mult"][1:M:end])
