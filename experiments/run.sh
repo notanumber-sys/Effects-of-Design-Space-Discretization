@@ -145,3 +145,4 @@ echo "GENERATING PLOTS..."
 bash plotter.jl $identifier
 
 echo "DONE!"
+
