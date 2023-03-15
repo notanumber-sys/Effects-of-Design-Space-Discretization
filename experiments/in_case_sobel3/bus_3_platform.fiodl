@@ -28,11 +28,11 @@ systemgraph {
   [platform::InstrumentedCommunicationModule, visualization::Visualizable]
   (bus, tileMemory, tileProcessor)
   {
-    "maxCyclesPerFlit": 2_i,
+    "maxCyclesPerFlit": 3_i,
     "flitSizeInBits": 128_l,
     "initialLatency": 0_l,
     "operatingFrequencyInHertz": 50000000_l,
-    "maxConcurrentFlits": 2_i
+    "maxConcurrentFlits": 3_i
   }
   vertex "micro_blaze_os0"
   [decision::Allocated, platform::runtime::StaticCyclicScheduler, visualization::Visualizable]
@@ -71,11 +71,11 @@ systemgraph {
   [platform::InstrumentedCommunicationModule, visualization::Visualizable]
   (bus, tileMemory, tileProcessor)
   {
-    "maxCyclesPerFlit": 2_i,
+    "maxCyclesPerFlit": 3_i,
     "flitSizeInBits": 128_l,
     "initialLatency": 0_l,
     "operatingFrequencyInHertz": 50000000_l,
-    "maxConcurrentFlits": 2_i
+    "maxConcurrentFlits": 3_i
   }
   vertex "micro_blaze_os1"
   [decision::Allocated, platform::runtime::StaticCyclicScheduler, visualization::Visualizable]
@@ -85,17 +85,59 @@ systemgraph {
   [decision::Allocated, platform::runtime::StaticCyclicScheduler]
   (allocationHosts)
   {}
-
+  vertex "tile_2"
+  [platform::AbstractStructure, visualization::GreyBox]
+  (contained, submodules)
+  {}
+  vertex "micro_blaze_2"
+  [platform::InstrumentedProcessingModule, visualization::GreyBox, visualization::Visualizable]
+  (contained, defaultMemory, networkInterface)
+  {
+    "operatingFrequencyInHertz": 50000000_l,
+    "modalInstructionsPerCycle": {
+      "eco": {
+        "all":      0.01538461538_64
+      },
+      "default": {
+        "all":      0.07692307692_64
+      }
+    }
+  }
+  vertex "micro_blaze_mem2"
+  [platform::GenericMemoryModule, visualization::Visualizable]
+  (instructionsAndData, networkInterface)
+  {
+    "spaceInBits": 8388608_l,
+    "operatingFrequencyInHertz": 50000000_l
+  }
+  vertex "micro_blaze_ni2"
+  [platform::InstrumentedCommunicationModule, visualization::Visualizable]
+  (bus, tileMemory, tileProcessor)
+  {
+    "maxCyclesPerFlit": 3_i,
+    "flitSizeInBits": 128_l,
+    "initialLatency": 0_l,
+    "operatingFrequencyInHertz": 50000000_l,
+    "maxConcurrentFlits": 3_i
+  }
+  vertex "micro_blaze_os2"
+  [decision::Allocated, platform::runtime::StaticCyclicScheduler, visualization::Visualizable]
+  (allocationHosts)
+  {}
+  vertex "micro_blaze_ni_slots2"
+  [decision::Allocated, platform::runtime::StaticCyclicScheduler]
+  (allocationHosts)
+  {}
 
   vertex "TDMBus"
   [platform::InstrumentedCommunicationModule, visualization::Visualizable]
-  (ni_0, ni_1)
+  (ni_0, ni_1, ni_2)
   {
-    "maxCyclesPerFlit": 2_i,
+    "maxCyclesPerFlit": 3_i,
     "flitSizeInBits": 128_l,
     "initialLatency": 0_l,
     "operatingFrequencyInHertz": 666667000_l,
-    "maxConcurrentFlits": 2_i
+    "maxConcurrentFlits": 3_i
   }
   vertex "busSched"
   [decision::Allocated, platform::runtime::StaticCyclicScheduler]
@@ -131,9 +173,26 @@ systemgraph {
   edge [visualization::VisualContainment] from "micro_blaze_1" port "contained" to "micro_blaze_os1" 
   edge [decision::AbstractAllocation] from "micro_blaze_os1" port "allocationHosts" to "micro_blaze_1" 
   edge [decision::AbstractAllocation] from "micro_blaze_ni_slots1" port "allocationHosts" to "micro_blaze_ni1" 
+  edge [] from "tile_2" port "submodules" to "micro_blaze_2" 
+  edge [visualization::VisualContainment] from "tile_2" port "contained" to "micro_blaze_2" 
+  edge [] from "tile_2" port "submodules" to "micro_blaze_mem2" 
+  edge [visualization::VisualContainment] from "tile_2" port "contained" to "micro_blaze_mem2" 
+  edge [] from "tile_2" port "submodules" to "micro_blaze_ni2" 
+  edge [visualization::VisualContainment] from "tile_2" port "contained" to "micro_blaze_ni2" 
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_2" port "networkInterface" to "micro_blaze_ni2" port "tileProcessor"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_ni2" port "tileProcessor" to "micro_blaze_2" port "networkInterface"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_2" port "defaultMemory" to "micro_blaze_mem2" port "instructionsAndData"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_mem2" port "instructionsAndData" to "micro_blaze_2" port "defaultMemory"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_mem2" port "networkInterface" to "micro_blaze_ni2" port "tileMemory"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_ni2" port "tileMemory" to "micro_blaze_mem2" port "networkInterface"
+  edge [visualization::VisualContainment] from "micro_blaze_2" port "contained" to "micro_blaze_os2" 
+  edge [decision::AbstractAllocation] from "micro_blaze_os2" port "allocationHosts" to "micro_blaze_2" 
+  edge [decision::AbstractAllocation] from "micro_blaze_ni_slots2" port "allocationHosts" to "micro_blaze_ni2" 
   edge [decision::AbstractAllocation] from "busSched" port "allocationHosts" to "TDMBus" 
   edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_ni0" port "bus" to "TDMBus" port "ni_0"
   edge [platform::PhysicalConnection,visualization::VisualConnection] from "TDMBus" port "ni_0" to "micro_blaze_ni0" port "bus"
   edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_ni1" port "bus" to "TDMBus" port "ni_1"
   edge [platform::PhysicalConnection,visualization::VisualConnection] from "TDMBus" port "ni_1" to "micro_blaze_ni1" port "bus"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "micro_blaze_ni2" port "bus" to "TDMBus" port "ni_2"
+  edge [platform::PhysicalConnection,visualization::VisualConnection] from "TDMBus" port "ni_2" to "micro_blaze_ni2" port "bus"
 }
