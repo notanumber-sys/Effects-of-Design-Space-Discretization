@@ -112,7 +112,7 @@ do
 	times_buff=()
 	for (( c=1; c<=$nreps; c++ ))
 	do
-	    times_buff+=($({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>&1))
+	    times_buff+=($({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md --exploration-timeout 60 -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>&1))
 	done
 	echo "${times_buff[@]}" >> $timesfile
     done
