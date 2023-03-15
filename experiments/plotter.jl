@@ -30,6 +30,18 @@ function savefigs(p, plotname)
     end
 end
 
+function bound_estimator(x, a, f)
+    inum = x ÷ a + 1
+    return f(x/(inum*a))
+end
+
+function bound_estimator_factory(data, N)
+    k = data["n_through"][1]/data["time_mult"][1]
+    a = Int(round(data["n_through"][end]/k))
+    f = x -> a*x
+    return (x -> bound_estimator(x, a, f)), (x -> f(x/(x + a))), a
+end
+
 function plot_th_by_time_mult(data, N, M)
     p = plot(
         data["time_mult"][1:M:end],
@@ -50,6 +62,39 @@ function plot_th_by_time_mult(data, N, M)
         )
     end
     savefigs(p, "th_vs_tm")
+end
+
+function plot_th_by_time_mult_analysis(data, N, M)
+    be, le, a = bound_estimator_factory(data, N)
+    p = plot(
+        data["time_mult"][1:M:end],
+        be.(data["time_mult"][1:M:end]),
+        xaxis=("time multiplier", :log10),
+        yaxis=("throughput"),
+        title=@sprintf("Th analysis; case: %s", identifier),
+        label="predicted throughput",
+        legend=:bottomright
+    )
+    plot!(p,
+        data["time_mult"][1:M:end],
+        data["n_through"][1:M:end],
+        label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
+        seriestype=:scatter,
+        mark=:x
+    )
+    plot!(p,
+        data["time_mult"][1:M:end],
+        le.(data["time_mult"][1:M:end]),
+        label=@sprintf("lower bound"),
+        linestyle=:dash
+    )
+    plot!(p,
+        data["time_mult"][1:M:end],
+        ones(N).*a,
+        label=@sprintf("upper bound"),
+        linestyle=:dash
+    )
+    savefigs(p, "th_vs_tm_analysis")
 end
 
 function plot_errest_by_time_mult(data, N, M)
@@ -75,6 +120,36 @@ function plot_errest_by_time_mult(data, N, M)
         )
     end
     savefigs(p, "err_vs_tm")
+end
+
+function plot_errest_by_time_mult_analysis(data, N, M)
+    be, le, a = bound_estimator_factory(data, N)
+    correct = data["n_through"][end]
+    vals = correct.-data["n_through"][1:M:end]
+    bvals = correct.-be.(data["time_mult"][1:M:end])
+    lvals = correct.-le.(data["time_mult"][1:M:end])
+    p = plot(
+        data["time_mult"][1:M:end][bvals.>0],
+        bvals[bvals.>0],
+        xaxis=("time multiplier", :log10),
+        yaxis=("throughput", :log10),
+        title=@sprintf("Error analysis; case: %s", identifier),
+        label="predicted throughput error"
+    )
+    plot!(p,
+        data["time_mult"][1:M:end][vals.>0],
+        vals[vals.>0],
+        label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
+        seriestype=:scatter,
+        mark=:x
+    )
+    plot!(p,
+        data["time_mult"][1:M:end][lvals.>0],
+        lvals[lvals.>0],
+        label=@sprintf("bound"),
+        linestyle=:dash
+    )
+    savefigs(p, "err_vs_tm_analysis")
 end
 
 function plot_time_by_time_mult(data, N, M)
@@ -259,6 +334,10 @@ function plot_errest_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
     savefigs(p, "err_vs_tm")
 end
 
+function plot_errdiv_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
+    @printf("TBD\n")
+end
+
 function load_data(identifier)
     target = @sprintf("out_case_%s.csv", identifier)
     data, N, M = read_data(target)
@@ -276,12 +355,14 @@ function single_analysis(identifier)
     
     # make plots
     plot_th_by_time_mult(data, N, M)
+    plot_th_by_time_mult_analysis(data, N, M)
     plot_errest_by_time_mult(data, N, M)
+    plot_errest_by_time_mult_analysis(data, N, M)
     plot_time_by_time_mult(data, N, M)
     plot_th_by_mem_div(data, N, M)
     plot_errest_by_mem_div(data, N, M)
     plot_time_by_mem_div(data, N, M)
-    plot_errest_by_time(data, N, M)    
+    plot_errest_by_time(data, N, M)
 end
 
 function double_analysis(identifier_sparse, identifier_dense)
