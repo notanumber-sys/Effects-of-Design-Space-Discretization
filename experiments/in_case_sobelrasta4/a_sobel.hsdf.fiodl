@@ -1,0 +1,232 @@
+systemgraph {
+  vertex "get_pixel"
+  [impl::InstrumentedExecutable, moc::sdf::SDFActor, visualization::Visualizable]
+  (combFunctions, p0_0, p0_1, p0_2, p0_3, p0_4, p0_5, p1_0, p1_1, p1_2, p1_3, p1_4, p1_5)
+  {
+    "production": {
+      "p0_2": 1_i,
+      "p1_1": 1_i,
+      "p0_1": 1_i,
+      "p1_0": 1_i,
+      "p0_0": 1_i,
+      "p1_5": 1_i,
+      "p0_5": 1_i,
+      "p1_4": 1_i,
+      "p0_4": 1_i,
+      "p1_3": 1_i,
+      "p0_3": 1_i,
+      "p1_2": 1_i
+    },
+    "consumption": {
+
+    },
+    "sizeInBits": 2_l,
+    "operationRequirements": {
+      "proc": {
+        "all": 320_l
+      }
+    }
+  }
+  vertex "gx"
+  [impl::InstrumentedExecutable, moc::sdf::SDFActor, visualization::Visualizable]
+  (combFunctions, p0_0, p0_1, p0_2, p0_3, p0_4, p0_5, p1_0)
+  {
+    "production": {
+      "p1_0": 1_i
+    },
+    "consumption": {
+      "p0_2": 1_i,
+      "p0_1": 1_i,
+      "p0_0": 1_i,
+      "p0_5": 1_i,
+      "p0_4": 1_i,
+      "p0_3": 1_i
+    },
+    "sizeInBits": 4_l,
+    "operationRequirements": {
+      "proc": {
+        "all": 77_l
+      }
+    }
+  }
+  vertex "gy"
+  [impl::InstrumentedExecutable, moc::sdf::SDFActor, visualization::Visualizable]
+  (combFunctions, p0_0, p0_1, p0_2, p0_3, p0_4, p0_5, p1_0)
+  {
+    "production": {
+      "p1_0": 1_i
+    },
+    "consumption": {
+      "p0_2": 1_i,
+      "p0_1": 1_i,
+      "p0_0": 1_i,
+      "p0_5": 1_i,
+      "p0_4": 1_i,
+      "p0_3": 1_i
+    },
+    "sizeInBits": 4_l,
+    "operationRequirements": {
+      "proc": {
+        "all": 77_l
+      }
+    }
+  }
+  vertex "abs"
+  [impl::InstrumentedExecutable, moc::sdf::SDFActor, visualization::Visualizable]
+  (combFunctions, p0_0, p1_0)
+  {
+    "production": {
+
+    },
+    "consumption": {
+      "p1_0": 1_i,
+      "p0_0": 1_i
+    },
+    "sizeInBits": 5_l,
+    "operationRequirements": {
+      "proc": {
+        "all": 123_l
+      }
+    }
+  }
+  vertex "chSo1_0"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo1_1"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo1_2"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo1_3"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo1_4"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo1_5"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo2_0"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo2_1"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo2_2"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo2_3"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo2_4"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo2_5"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo3_0"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  vertex "chSo4_0"
+  [impl::TokenizableDataBlock, moc::sdf::SDFChannel, visualization::Visualizable]
+  (consumer, initialTokenValues, producer)
+  {
+    "numOfInitialTokens": 0_i,
+    "maxSizeInBits": 0_l,
+    "tokenSizeInBits": 8_l
+  }
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p0_0" to "chSo1_0" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo1_0" port "consumer" to "gx" port "p0_0"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p0_1" to "chSo1_1" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo1_1" port "consumer" to "gx" port "p0_1"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p0_2" to "chSo1_2" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo1_2" port "consumer" to "gx" port "p0_2"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p0_3" to "chSo1_3" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo1_3" port "consumer" to "gx" port "p0_3"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p0_4" to "chSo1_4" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo1_4" port "consumer" to "gx" port "p0_4"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p0_5" to "chSo1_5" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo1_5" port "consumer" to "gx" port "p0_5"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p1_0" to "chSo2_0" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo2_0" port "consumer" to "gy" port "p0_0"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p1_1" to "chSo2_1" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo2_1" port "consumer" to "gy" port "p0_1"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p1_2" to "chSo2_2" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo2_2" port "consumer" to "gy" port "p0_2"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p1_3" to "chSo2_3" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo2_3" port "consumer" to "gy" port "p0_3"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p1_4" to "chSo2_4" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo2_4" port "consumer" to "gy" port "p0_4"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "get_pixel" port "p1_5" to "chSo2_5" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo2_5" port "consumer" to "gy" port "p0_5"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "gx" port "p1_0" to "chSo3_0" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo3_0" port "consumer" to "abs" port "p0_0"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "gy" port "p1_0" to "chSo4_0" port "producer"
+  edge [moc::sdf::SDFDataEdge,visualization::VisualConnection] from "chSo4_0" port "consumer" to "abs" port "p1_0"
+}
