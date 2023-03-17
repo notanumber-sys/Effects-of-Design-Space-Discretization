@@ -1,5 +1,11 @@
 #!/bin/bash
 # runs a batch of experiments.
+#
+#     run.sh [identifier] <M <N <T>>>
+#
+# M   cores to utilize
+# N   batch size
+# T   stop after evaluation (don't generate plots)
 
 echo "READING TEST CONFIGURATION..."
 
@@ -28,22 +34,36 @@ then
     exit 1
 fi
 
-nreps=1
+nproc=1
 if [ "$#" -gt 1 ]
 then
     if [[ $2 =~ ^[0-9]+$ ]]
     then
-        nreps=$2
+        nproc=$2
+        echo "Processes set to $nproc"
+    else
+	echo "Failed to set processes!"
+	echo "    $2 is not a number!"
+	echo "    Continuing with processes=$nproc"
+    fi
+fi
+
+nreps=1
+if [ "$#" -gt 2 ]
+then
+    if [[ $3 =~ ^[0-9]+$ ]]
+    then
+        nreps=$3
         echo "Repetitions set to $nreps"
     else
 	echo "Failed to set repetitions!"
-	echo "    $2 is not a number!"
+	echo "    $3 is not a number!"
 	echo "    Continuing with repetitions=$nreps"
     fi
 fi
 
 stopearly=0
-if [ "$#" -eq 3 ]
+if [ "$#" -eq 4 ]
 then
     stopearly=1
     echo "Script will not generate any plots."
@@ -107,24 +127,58 @@ echo "RUNNING TESTS..."
 TIMEFORMAT="%R"
 LC_NUMERIC="en_US.UTF-8"
 
+# Starts M processes and then waits for all of them to finish,
+# if less than M processes remain, it waits for all running processes
+# to finish before continuing.
+
 outfile=$solution_dir/idesyde.out
-timesfile=$solution_dir/times
 touch $outfile
-touch $timesfile
+started=0
 for sm in ${spa_muls[@]}
 do
     for md in ${mem_divs[@]}
     do
 	out_name="${sm}_${md}.fiodl"
-	echo "Running sm=$sm, md=$md"
-	times_buff=()
-	for (( c=1; c<=$nreps; c++ ))
+	echo -n "Running sm=$sm, md=$md"
+	for (( c=1 ; c<=$nreps ; c++ ))
 	do
-	    times_buff+=($({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md --exploration-timeout 60 -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>&1))
+	    echo -n "."
+	    proc_name=idesyde_${sm}_${md}_${c}
+	    # the following command launches a time command that redirects to a file solution_dir/procname
+	    # the timed command is a call to the IDeSyDe cli-assembly with output redirected to solution_dir/idesyde.out
+	    # the IDeSyDe solver runs a specific case and writes output to solution_dir/out_name.fiodl
+	    $({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md --exploration-timeout 60 -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name) &
+	    ((started++))
+	    if [ $started -eq $nproc ]
+	    then
+		started=0
+		wait
+	    fi
+	done
+	echo ""
+    done
+done
+wait
+
+echo "COLLECT TIMES..."
+timesfile=$solution_dir/times
+touch $timesfile
+for sm in ${spa_muls[@]}
+do
+    for md in ${mem_divs[@]}
+    do
+	times_buff=()
+	for (( c=1 ; c<=$nreps ; c++))
+	do
+	    time_measurement=${solution_dir}/idesyde_${sm}_${md}_${c}
+	    read -r line < $time_measurement
+	    times_buff+="$line "
+	    rm $time_measurement
 	done
 	echo "${times_buff[@]}" >> $timesfile
     done
 done
+echo "TIMES COLLECTED!"
 
 echo "SOLUTIONS DONE!"
 echo "EVALUATING SOLUTIONS..."
