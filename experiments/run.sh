@@ -7,6 +7,12 @@
 # N   batch size
 # T   stop after evaluation (don't generate plots)
 
+# configuration
+if [ -z $IDESYDE_TIMEOUT ]
+then
+    IDESYDE_TIMEOUT=3600
+fi
+
 echo "READING TEST CONFIGURATION..."
 
 # test that everything seems to be fine.
@@ -147,7 +153,7 @@ do
 	    # the following command launches a time command that redirects to a file solution_dir/procname
 	    # the timed command is a call to the IDeSyDe cli-assembly with output redirected to solution_dir/idesyde.out
 	    # the IDeSyDe solver runs a specific case and writes output to solution_dir/out_name.fiodl
-	    $({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md --exploration-timeout 60 -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name) &
+	    $({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md --exploration-timeout $IDESYDE_TIMEOUT -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name) &
 	    ((started++))
 	    if [ $started -eq $nproc ]
 	    then
@@ -160,6 +166,9 @@ do
 done
 wait
 
+# The time measurements are stored in separate files to avoid
+# concurrency issues. This chews through them and compiles them
+# into a structured file.
 echo "COLLECT TIMES..."
 timesfile=$solution_dir/times
 touch $timesfile
@@ -199,4 +208,3 @@ echo "GENERATING PLOTS..."
 bash plotter.jl $identifier
 
 echo "DONE!"
-
