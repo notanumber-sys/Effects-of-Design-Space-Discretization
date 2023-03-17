@@ -2,3 +2,5 @@ so_case*
 plt_case*
 plt_dcase*
 devel/*
+*.nohup.out
+*.nohup.err
