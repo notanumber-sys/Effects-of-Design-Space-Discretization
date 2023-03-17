@@ -10,7 +10,7 @@
 # configuration
 if [ -z $IDESYDE_TIMEOUT ]
 then
-    IDESYDE_TIMEOUT=3600
+    IDESYDE_TIMEOUT=7200
 fi
 
 echo "READING TEST CONFIGURATION..."
