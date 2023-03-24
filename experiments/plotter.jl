@@ -6,7 +6,7 @@ exec julia --color=yes --startup-file=no "${BASH_SOURCE[0]}" "$@"
 #@show ARGS
 
 using Printf, Plots, CSV
-using LinearAlgebra
+using LinearAlgebra, Interpolations
 
 # mode if program is run as script
 mode = abspath(PROGRAM_FILE) == @__FILE__
@@ -159,7 +159,7 @@ function plot_time_by_time_mult(data, N, M)
         data["time_mult"][1:M:end],
         data["time"][1:M:end],
         xaxis=("time multiplier", :log10),
-        yaxis=("run time"),
+        yaxis=("run time", :log10),
         title=@sprintf("Median time vs. tm; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
         mark=(N>100 ? :none : :circle),
@@ -336,6 +336,33 @@ function plot_errest_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
     savefigs(p, "err_vs_tm")
 end
 
+function throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
+    TOL = 1e-8
+    interpolator = LinearInterpolation(data1["time_mult"][1:M1:end], data1["n_through"][1:M1:end])
+    index_set = (data2["time_mult"][1:M2:end].>=data1["time_mult"][1]).&(data2["time_mult"][1:M2:end].<=data1["time_mult"][end])
+    error_series = abs.(data2["n_through"][1:M2:end][index_set] - interpolator.(data2["time_mult"][1:M2:end][index_set]))
+    max_index = argmax(error_series.*data2["time_mult"][1:M2:end][index_set])
+    ref = x -> (error_series[max_index]*data2["time_mult"][1:M2:end][index_set][max_index])/x
+    p = plot(
+        data2["time_mult"][1:M2:end][index_set][error_series.>TOL],
+        error_series[error_series.>TOL],
+        xaxis=("time multiplier", :log10),
+        yaxis=("throughput deviation", :log10),
+        title=@sprintf("Th deviation; case: %s, %s", identifier, identifier2),
+        label=@sprintf("Error deviation, md=%d", data1["mem_div"][1]),
+        seriestype=:scatter,
+        mark=:x,
+        legend=:topright
+    )
+    plot!(p,
+        data2["time_mult"][1:M2:end][index_set],
+        ref.(data2["time_mult"][1:M2:end][index_set]),
+        label=@sprintf("Reference %.2f/x", error_series[max_index]),
+        linestyle=:dash
+    )
+    savefigs(p, "th_dev_vs_tm")
+end
+
 function plot_errdiv_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
     @printf("TBD\n")
 end
@@ -380,6 +407,7 @@ function double_analysis(identifier_sparse, identifier_dense)
     # make plots
     plot_th_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
     plot_errest_by_time_mult_comp(data1, N1, M1, data2, N2, M2)
+    throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
 end
 
 # determine target
