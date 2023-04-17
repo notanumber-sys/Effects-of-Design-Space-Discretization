@@ -13,6 +13,8 @@ then
     IDESYDE_TIMEOUT=7200
 fi
 
+IDESYDE_EXECUTABLE="idesyde.exe"
+
 echo "READING TEST CONFIGURATION..."
 
 # test that everything seems to be fine.
@@ -133,6 +135,27 @@ echo "RUNNING TESTS..."
 TIMEFORMAT="%R"
 LC_NUMERIC="en_US.UTF-8"
 
+# Utility function to execute a particular case and perform required post processing and clean-up.
+execute_case () {
+    # setup local environment
+    local proc_sm=$1
+    local proc_md=$2
+    local proc_out_name_fiodl=$3
+    local proc_out_name_json=$4
+    local proc_name_loc=$5
+    local proc_run_dir=$6
+    # the following command launches a time command that redirects to a file solution_dir/procname
+    # the timed command is a call to the IDeSyDe entry point with output redirected to solution_dir/idesyde.out
+    # the IDeSyDe solver runs a specific case and writes output to solution_dir/out_name.fiodl and intermediate
+    #     data to a temporary run folder run_dir/
+    $({ time ./$IDESYDE_EXECUTABLE --x-time-resolution $proc_sm --x-memory-resolution $proc_md --x-total-time-out $IDESYDE_TIMEOUT --run-path $proc_run_dir -o "$solution_dir/$proc_out_name_fiodl" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name_loc )
+    # move resulting JSON
+    local data_files=(${proc_run_dir}/explored/body_*.json)
+    mv ${data_files[-1]} $solution_dir/$proc_out_name_json
+    # cleans up run directory after finishing
+    rm -r $proc_run_dir
+}
+
 # Starts M processes and then waits for all of them to finish,
 # if less than M processes remain, it waits for all running processes
 # to finish before continuing.
@@ -144,16 +167,16 @@ for sm in ${spa_muls[@]}
 do
     for md in ${mem_divs[@]}
     do
-	out_name="${sm}_${md}.fiodl"
+	out_name_fiodl="${sm}_${md}.fiodl"
+	out_name_json="${sm}_${md}.json"
 	echo -n "Running sm=$sm, md=$md"
 	for (( c=1 ; c<=$nreps ; c++ ))
 	do
 	    echo -n "."
 	    proc_name=idesyde_${sm}_${md}_${c}
-	    # the following command launches a time command that redirects to a file solution_dir/procname
-	    # the timed command is a call to the IDeSyDe cli-assembly with output redirected to solution_dir/idesyde.out
-	    # the IDeSyDe solver runs a specific case and writes output to solution_dir/out_name.fiodl
-	    $({ time java -jar cli-assembly.jar --time-multiplier $sm --memory-divider $md --exploration-timeout $IDESYDE_TIMEOUT -o "$solution_dir/$out_name" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name) &
+	    run_dir=run_${identifier}_${started}
+	    execute_case $sm $md $out_name_fiodl $out_name_json $proc_name $run_dir &
+	    sleep 0.1
 	    ((started++))
 	    if [ $started -eq $nproc ]
 	    then
@@ -190,10 +213,10 @@ done
 echo "TIMES COLLECTED!"
 
 echo "SOLUTIONS DONE!"
+
 echo "EVALUATING SOLUTIONS..."
 
-resultfile=out_case_${identifier}.csv
-java -cp evaluator.jar evaluator.Main $identifier > $resultfile
+python3 evaluator.py $identifier
 
 echo "EVALUATION DONE!"
 
