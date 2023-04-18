@@ -151,9 +151,23 @@ execute_case () {
     $({ time ./$IDESYDE_EXECUTABLE --x-time-resolution $proc_sm --x-memory-resolution $proc_md --x-total-time-out $IDESYDE_TIMEOUT --run-path $proc_run_dir -o "$solution_dir/$proc_out_name_fiodl" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name_loc )
     # move resulting JSON
     local data_files=(${proc_run_dir}/explored/body_*.json)
-    mv ${data_files[-1]} $solution_dir/$proc_out_name_json
-    # cleans up run directory after finishing
-    rm -r $proc_run_dir
+#    echo ""
+#    for str in ${data_files[@]}
+#    do
+#	echo "DUMP: $str"
+#    done
+    if [ ${#data_files[@]} -eq 0 ]
+    then
+	echo ""
+	echo "Warning! Case tr=$proc_sm, mr=$proc_md failed to collect ANY results."
+	echo "    The experiment cannot continue."
+	wait
+	exit 1
+    else
+	mv ${data_files[-1]} $solution_dir/$proc_out_name_json
+	# cleans up run directory after finishing
+	rm -r $proc_run_dir
+    fi
 }
 
 # Starts M processes and then waits for all of them to finish,
