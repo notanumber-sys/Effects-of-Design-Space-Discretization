@@ -337,9 +337,9 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     end
     for m in 1:M1
         plot!(p,
-            data["time_res"][m:M1:end],
-            data["exa_th"][m:M1:end],
-            label=@sprintf("Throughput, mr=%d", data["mem_res"][m]),
+            data1["time_res"][m:M1:end],
+            data1["exa_th"][m:M1:end],
+            label=@sprintf("Throughput, mr=%d", data1["mem_res"][m]),
             mark=:circle
         )
     end
@@ -347,7 +347,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
 end
 
 function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
-    correct = data1["exa_th"][end]
+    correct = max(data1["exa_th"][end], data2["exa_th"][end])
     vals1 = correct.-data1["num_th"][1:M1:end]
     p = plot(
         data1["time_res"][1:M1:end][vals1.>0],
@@ -378,11 +378,11 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         )
     end
     for m in 1:M1
-        vals_exa = correct.-data["exa_th"][m:M:end]
+        vals_exa = correct.-data1["exa_th"][m:M1:end]
         plot!(p,
-            data["time_res"][m:M:end][vals_exa.>0],
+            data1["time_res"][m:M1:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
+            label=@sprintf("Error exact, mr=%d", data1["mem_res"][m]),
             mark=:circle
         )
     end
