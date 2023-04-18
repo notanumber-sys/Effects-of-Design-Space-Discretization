@@ -52,20 +52,31 @@ function plot_th_by_time_res(data, N, M)
         yaxis=("throughput"),
         title=@sprintf("Th vs. tr; case: %s", identifier),
         label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
-        mark=(N>100 ? :none : :circle),
-        legend=:bottomright
+        mark=(N>100 ? :none : :x),
+        legend=:bottomright,
+        linestyle=:dash
     )
     for m in 2:M
         plot!(p,
             data["time_res"][m:M:end],
             data["num_th"][m:M:end],
             label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
+            mark=(N>100 ? :none : :x),
+            linestyle=:dash
+        )
+    end
+    for m in 1:M
+        plot!(p,
+            data["time_res"][m:M:end],
+            data["exa_th"][m:M:end],
+            label=@sprintf("Throughput, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
     savefigs(p, "th_vs_tr")
 end
 
+#TODO: Update
 function plot_th_by_time_res_analysis(data, N, M)
     be, le = bound_estimator_factory(data, N)
     p = plot(
@@ -100,17 +111,18 @@ function plot_th_by_time_res_analysis(data, N, M)
 end
 
 function plot_errest_by_time_res(data, N, M)
-    correct = data["num_th"][end]  # TODO: Update this to more exact exa_th
+    correct = data["exa_th"][end]
     vals = correct.-data["num_th"][1:M:end]
     p = plot(
         data["time_res"][1:M:end][vals.>0],
         vals[vals.>0],
         xaxis=("time resolution", :log10),
         yaxis=("error estimate", :log10),
-        title=@sprintf("Error estimate vs. tr; case: %s", identifier),
+        title=@sprintf("Error numerical vs. tr; case: %s", identifier),
         label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
-        mark=(N>100 ? :none : :circle),
-        legend=:topright
+        mark=(N>100 ? :none : :x),
+        legend=:topright,
+        linestyle=:dash
     )
     for m in 2:M
         vals = correct.-data["num_th"][m:M:end]
@@ -118,12 +130,23 @@ function plot_errest_by_time_res(data, N, M)
             data["time_res"][m:M:end][vals.>0],
             vals[vals.>0],
             label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
+            mark=(N>100 ? :none : :x),
+            linestyle=:dash
+        )
+    end
+    for m in 1:M
+        vals_exa = correct.-data["exa_th"][m:M:end]
+        plot!(p,
+            data["time_res"][m:M:end][vals_exa.>0],
+            vals_exa[vals_exa.>0],
+            label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
     savefigs(p, "err_vs_tr")
 end
 
+#TODO: Update
 function plot_errest_by_time_res_analysis(data, N, M)
     be, le = bound_estimator_factory(data, N)
     correct = data["num_th"][end]
@@ -176,6 +199,7 @@ function plot_time_by_time_res(data, N, M)
     savefigs(p, "t_vs_tr")
 end
 
+#TODO: Update
 function plot_th_by_mem_res(data, N, M)
     p = plot(
         data["mem_res"][1:M],
@@ -198,8 +222,9 @@ function plot_th_by_mem_res(data, N, M)
     savefigs(p, "th_vs_mr")
 end
 
+#TODO: Update
 function plot_errest_by_mem_res(data, N, M)
-    correct = data["num_th"][end]  # TODO: Update this to more exact exa_th
+    correct = data["exa_th"][end]
     vals = correct.-data["num_th"][1:M]
     p = plot(
         data["mem_res"][1:M][vals.>0],
@@ -211,6 +236,7 @@ function plot_errest_by_mem_res(data, N, M)
         mark=:circle,
         legend=:topright
     )
+
     for n in 2:N
         vals = correct.-data["num_th"][M*(n-1)+1:M*n]
         plot!(p,
@@ -223,6 +249,7 @@ function plot_errest_by_mem_res(data, N, M)
     savefigs(p, "err_vs_mr")
 end
 
+#TODO: Update
 function plot_time_by_mem_res(data, N, M)
     p = plot(
         data["mem_res"][1:M],
@@ -246,7 +273,7 @@ function plot_time_by_mem_res(data, N, M)
 end
 
 function plot_errest_by_time(data, N, M)
-    correct = data["num_th"][end]  # TODO: Update this to more exact exa_th
+    correct = data["exa_th"][end]
     vals = correct.-data["num_th"][1:M:end]
     p = plot(
         data["time"][1:M:end][vals.>0],
@@ -256,7 +283,7 @@ function plot_errest_by_time(data, N, M)
         title=@sprintf("Error est. vs. median time; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
         seriestype=:scatter,
-        mark=:circle,
+        mark=:x,
         legend=:topright
     )
     for m in 2:M
@@ -266,6 +293,15 @@ function plot_errest_by_time(data, N, M)
             vals[vals.>0],
             label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
+            mark=:x
+        )
+    end
+    for m in 1:M
+        vals_exa = correct.-data["exa_th"][m:M:end]
+        plot!(p,
+            data["time"][m:M:end][vals_exa.>0],
+            vals_exa[vals_exa.>0],
+            label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
             mark=:circle
         )
     end
@@ -280,7 +316,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         yaxis=("throughput"),
         title=@sprintf("Th vs. tr comp; case: %s, %s", identifier, identifier2),
         label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][1]),
-        mark=:circle,
+        mark=:x,
         legend=:bottomright
     )
     for m in 2:M1
@@ -288,7 +324,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
             data1["time_res"][m:M1:end],
             data1["num_th"][m:M1:end],
             label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][m]),
-            mark=:circle
+            mark=:x
         )
     end
     for m in 1:M2
@@ -299,11 +335,19 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
             mark=:none
         )
     end
+    for m in 1:M1
+        plot!(p,
+            data["time_res"][m:M1:end],
+            data["exa_th"][m:M1:end],
+            label=@sprintf("Throughput, mr=%d", data["mem_res"][m]),
+            mark=:circle
+        )
+    end
     savefigs(p, "th_vs_tr")
 end
 
 function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
-    correct = data1["num_th"][end]  # TODO: Update this to more exact exa_th
+    correct = data1["exa_th"][end]
     vals1 = correct.-data1["num_th"][1:M1:end]
     p = plot(
         data1["time_res"][1:M1:end][vals1.>0],
@@ -312,7 +356,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         yaxis=("error estimate", :log10),
         title=@sprintf("Error estimate vs. tr comp; case: %s, %s", identifier, identifier2),
         label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][1]),
-        mark=:circle,
+        mark=:x,
         legend=:topright
     )
     for m in 2:M1
@@ -321,7 +365,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
             data1["time_res"][m:M1:end][vals1.>0],
             vals1[vals1.>0],
             label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][m]),
-            mark=:circle
+            mark=:x
         )
     end
     for m in 1:M2
@@ -331,6 +375,15 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
             vals2[vals2.>0],
             label=@sprintf("Disc Th., %s, mr=%d", identifier2, data2["mem_res"][m]),
             mark=:none
+        )
+    end
+    for m in 1:M1
+        vals_exa = correct.-data["exa_th"][m:M:end]
+        plot!(p,
+            data["time_res"][m:M:end][vals_exa.>0],
+            vals_exa[vals_exa.>0],
+            label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
+            mark=:circle
         )
     end
     savefigs(p, "err_vs_tr")
@@ -384,13 +437,13 @@ function single_analysis(identifier)
     
     # make plots
     plot_th_by_time_res(data, N, M)
-    plot_th_by_time_res_analysis(data, N, M)
+    #plot_th_by_time_res_analysis(data, N, M)
     plot_errest_by_time_res(data, N, M)
-    plot_errest_by_time_res_analysis(data, N, M)
+    #plot_errest_by_time_res_analysis(data, N, M)
     plot_time_by_time_res(data, N, M)
-    plot_th_by_mem_res(data, N, M)
-    plot_errest_by_mem_res(data, N, M)
-    plot_time_by_mem_res(data, N, M)
+    #plot_th_by_mem_res(data, N, M)
+    #plot_errest_by_mem_res(data, N, M)
+    #plot_time_by_mem_res(data, N, M)
     plot_errest_by_time(data, N, M)
 end
 
