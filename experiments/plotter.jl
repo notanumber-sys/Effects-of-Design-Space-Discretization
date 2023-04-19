@@ -335,12 +335,12 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
             mark=:none
         )
     end
-    for m in 1:M1
+    for m in 1:M2
         plot!(p,
-            data1["time_res"][m:M1:end],
-            data1["exa_th"][m:M1:end],
+            data2["time_res"][m:M2:end],
+            data2["exa_th"][m:M2:end],
             label=@sprintf("Throughput, mr=%d", data1["mem_res"][m]),
-            mark=:circle
+            mark=(N2>100 ? :none : :circle)
         )
     end
     savefigs(p, "th_vs_tr")
