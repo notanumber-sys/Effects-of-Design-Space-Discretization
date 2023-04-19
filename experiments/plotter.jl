@@ -302,6 +302,7 @@ function plot_errest_by_time(data, N, M)
             data["time"][m:M:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
             label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
+            seriestype=:scatter,
             mark=:circle
         )
     end
