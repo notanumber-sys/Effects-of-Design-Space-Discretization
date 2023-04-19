@@ -79,13 +79,13 @@ fi
 
 shopt -s nullglob
 model=($target/*.fiodl)
-echo "Using model files: ${model[@]}"
 if [ ${#model[@]} -eq 0 ]
 then
    echo "Unable to find any model files!"
    echo "    $target does not contain any .fiodl files."
    exit 1
 fi
+echo "Using model files: ${model[@]}"
 
 cfg_lines=()
 while read line; do
@@ -105,6 +105,13 @@ then
     echo "Invalid configuratio file!"
     echo "    Found ${#spa_muls[@]} time cases and ${#mem_divs[@]} mem cases."
     exit 1
+fi
+echo "Found ${#spa_muls[@]} time cases from ${spa_muls[0]} to ${spa_muls[-1]}."
+if [ ${#mem_divs[@]} -eq 1 ]
+then
+    echo "Found one mem case: ${mem_divs[0]}"
+else
+    echo "Found ${#mem_divs[@]} time cases from ${mem_divs[0]} to ${mem_divs[-1]}."
 fi
 
 solution_dir="so_case_$identifier"
