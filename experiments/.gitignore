@@ -4,3 +4,7 @@ plt_dcase*
 devel/*
 *.nohup.out
 *.nohup.err
+
+*.exe
+emodules/*
+imodules/*
