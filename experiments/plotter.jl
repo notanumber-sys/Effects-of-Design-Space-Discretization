@@ -163,7 +163,7 @@ function plot_time_by_time_mult(data, N, M)
         title=@sprintf("Median time vs. tm; batches: %d; case: %s", data["batch_size"][1], identifier),
         label=@sprintf("Disc Th., md=%d", data["mem_div"][1]),
         mark=(N>100 ? :none : :circle),
-        legend=:bottomright
+        legend=:topleft
     )
     for m in 2:M
         plot!(p,

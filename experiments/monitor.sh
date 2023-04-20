@@ -6,4 +6,4 @@ then
     exit 0
 fi
 
-watch -n 1 -d cat "${1}.nohup.out"
+watch -n 1 -d "cat ${1}.nohup.out | tail -n $((72 - 2))"
