@@ -111,15 +111,15 @@ function plot_th_by_time_res_analysis(data, N, M)
 end
 
 function plot_errest_by_time_res(data, N, M)
-    correct = data["exa_th"][end]
+    correct = maximum(data["exa_th"])
     vals = correct.-data["num_th"][1:M:end]
     p = plot(
         data["time_res"][1:M:end][vals.>0],
         vals[vals.>0],
         xaxis=("time resolution", :log10),
-        yaxis=("error estimate", :log10),
-        title=@sprintf("Error numerical vs. tr; case: %s", identifier),
-        label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
+        yaxis=("error estimate (Th)", :log10),
+        title=@sprintf("Error vs. tr; case: %s", identifier),
+        label=@sprintf("Total error, mr=%d", data["mem_res"][1]),
         mark=(N>100 ? :none : :x),
         legend=:topright,
         linestyle=:dash
@@ -129,7 +129,7 @@ function plot_errest_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end][vals.>0],
             vals[vals.>0],
-            label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
+            label=@sprintf("Total error, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :x),
             linestyle=:dash
         )
@@ -139,7 +139,7 @@ function plot_errest_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
+            label=@sprintf("Solution error, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
@@ -273,15 +273,15 @@ function plot_time_by_mem_res(data, N, M)
 end
 
 function plot_errest_by_time(data, N, M)
-    correct = data["exa_th"][end]
+    correct = maximum(data["exa_th"])
     vals = correct.-data["num_th"][1:M:end]
     p = plot(
         data["time"][1:M:end][vals.>0],
         vals[vals.>0],
         xaxis=("time [s]"),
-        yaxis=("error estimate", :log10),
+        yaxis=("error estimate (Th)", :log10),
         title=@sprintf("Error est. vs. median time; batches: %d; case: %s", data["batch_size"][1], identifier),
-        label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
+        label=@sprintf("Total error, mr=%d", data["mem_res"][1]),
         seriestype=:scatter,
         mark=:x,
         legend=:topright
@@ -291,7 +291,7 @@ function plot_errest_by_time(data, N, M)
         plot!(p,
             data["time"][m:M:end][vals.>0],
             vals[vals.>0],
-            label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
+            label=@sprintf("Total error, mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
             mark=:x
         )
@@ -301,7 +301,7 @@ function plot_errest_by_time(data, N, M)
         plot!(p,
             data["time"][m:M:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Error exact, mr=%d", data["mem_res"][m]),
+            label=@sprintf("Solution error, mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
             mark=:circle
         )
@@ -336,27 +336,36 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
             mark=:none
         )
     end
+    for m in 1:M1
+        plot!(p,
+            data1["time_res"][m:M1:end],
+            data1["exa_th"][m:M1:end],
+            label=@sprintf("Throughput sparse, mr=%d", data1["mem_res"][m]),
+	    seriestype=:scatter,
+            mark=:circle
+        )
+    end
     for m in 1:M2
         plot!(p,
             data2["time_res"][m:M2:end],
             data2["exa_th"][m:M2:end],
-            label=@sprintf("Throughput, mr=%d", data1["mem_res"][m]),
-            mark=(N2>100 ? :none : :circle)
+            label=@sprintf("Throughput dense, mr=%d", data2["mem_res"][m]),
+            mark=:none
         )
     end
     savefigs(p, "th_vs_tr")
 end
 
 function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
-    correct = max(data1["exa_th"][end], data2["exa_th"][end])
+    correct = max(maximum(data1["exa_th"]), maximum(data2["exa_th"]))
     vals1 = correct.-data1["num_th"][1:M1:end]
     p = plot(
         data1["time_res"][1:M1:end][vals1.>0],
         vals1[vals1.>0],
         xaxis=("time resolution", :log10),
-        yaxis=("error estimate", :log10),
+        yaxis=("error estimate (Th)", :log10),
         title=@sprintf("Error estimate vs. tr comp; case: %s, %s", identifier, identifier2),
-        label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][1]),
+        label=@sprintf("Total error, %s, mr=%d", identifier, data1["mem_res"][1]),
         mark=:x,
         legend=:topright
     )
@@ -365,7 +374,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data1["time_res"][m:M1:end][vals1.>0],
             vals1[vals1.>0],
-            label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][m]),
+            label=@sprintf("Total error, %s, mr=%d", identifier, data1["mem_res"][m]),
             mark=:x
         )
     end
@@ -374,7 +383,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data2["time_res"][m:M2:end][vals2.>0],
             vals2[vals2.>0],
-            label=@sprintf("Disc Th., %s, mr=%d", identifier2, data2["mem_res"][m]),
+            label=@sprintf("Total error, %s, mr=%d", identifier2, data2["mem_res"][m]),
             mark=:none
         )
     end
@@ -383,13 +392,24 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data1["time_res"][m:M1:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Error exact, mr=%d", data1["mem_res"][m]),
+            label=@sprintf("Solution error sparse, mr=%d", data1["mem_res"][m]),
+	    seriestype=:scatter,
             mark=:circle
+        )
+    end
+    for m in 1:M2
+        vals_exa = correct.-data2["exa_th"][m:M2:end]
+        plot!(p,
+            data2["time_res"][m:M2:end][vals_exa.>0],
+            vals_exa[vals_exa.>0],
+            label=@sprintf("Solution error dense, mr=%d", data2["mem_res"][m]),
+	    mark=:none
         )
     end
     savefigs(p, "err_vs_tr")
 end
 
+#TODO: Update
 function throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
     TOL = 1e-8
     interpolator = LinearInterpolation(data1["time_res"][1:M1:end], data1["num_th"][1:M1:end])
