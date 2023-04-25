@@ -22,7 +22,7 @@ do
     ./plotter.jl sobelrasta${i} sobelrasta${i}dense
 done
 
-for i in 2 3 4
+for i in 2 3 #4
 do
     echo "RJ${i}..."
     ./plotter.jl rastajpegsdf${i}
