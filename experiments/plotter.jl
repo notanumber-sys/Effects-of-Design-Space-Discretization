@@ -44,14 +44,25 @@ function bound_estimator_factory(data, N)
     return (x -> bound_estimator(x, a, f)), (x -> f(x/(x + a)))
 end
 
+function short_id(identifier)
+    return replace(
+        identifier,
+        "sobel" => "S",
+        "rasta" => "R",
+        "jpegsdf" => "J",
+        "ddense" => "dd",
+        "dense" => "dense"
+    )
+end
+
 function plot_th_by_time_res(data, N, M)
     p = plot(
         data["time_res"][1:M:end],
         data["num_th"][1:M:end],
         xaxis=("time resolution", :log10),
-        yaxis=("throughput"),
-        title=@sprintf("Th vs. tr; case: %s", identifier),
-        label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
+        yaxis=("throughput [ops/s]"),
+        title=@sprintf("Th vs. tr; %s", short_id(identifier)),
+        label=@sprintf("Num Th., mr=%d", data["mem_res"][1]),
         mark=(N>100 ? :none : :x),
         legend=:bottomright,
         linestyle=:dash
@@ -60,7 +71,7 @@ function plot_th_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end],
             data["num_th"][m:M:end],
-            label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
+            label=@sprintf("num Th., mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :x),
             linestyle=:dash
         )
@@ -69,7 +80,7 @@ function plot_th_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end],
             data["exa_th"][m:M:end],
-            label=@sprintf("Throughput, mr=%d", data["mem_res"][m]),
+            label=@sprintf("Th, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
@@ -84,7 +95,7 @@ function plot_th_by_time_res_analysis(data, N, M)
         be.(data["time_res"][1:M:end]),
         xaxis=("time resolution", :log10),
         yaxis=("throughput"),
-        title=@sprintf("Th analysis; case: %s", identifier),
+        title=@sprintf("Th analysis; case: %s", short_id(identifier)),
         label="predicted throughput",
         legend=:bottomright
     )
@@ -117,9 +128,9 @@ function plot_errest_by_time_res(data, N, M)
         data["time_res"][1:M:end][vals.>0],
         vals[vals.>0],
         xaxis=("time resolution", :log10),
-        yaxis=("error estimate (Th)", :log10),
-        title=@sprintf("Error vs. tr; case: %s", identifier),
-        label=@sprintf("Total error, mr=%d", data["mem_res"][1]),
+        yaxis=("error estimate (in Th) [ops/s]", :log10),
+        title=@sprintf("Error vs. tr; %s", short_id(identifier)),
+        label=@sprintf("total error, mr=%d", data["mem_res"][1]),
         mark=(N>100 ? :none : :x),
         legend=:topright,
         linestyle=:dash
@@ -129,7 +140,7 @@ function plot_errest_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end][vals.>0],
             vals[vals.>0],
-            label=@sprintf("Total error, mr=%d", data["mem_res"][m]),
+            label=@sprintf("total error, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :x),
             linestyle=:dash
         )
@@ -139,7 +150,7 @@ function plot_errest_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Solution error, mr=%d", data["mem_res"][m]),
+            label=@sprintf("solution error, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
@@ -158,7 +169,7 @@ function plot_errest_by_time_res_analysis(data, N, M)
         bvals[bvals.>0],
         xaxis=("time resolution", :log10),
         yaxis=("throughput", :log10),
-        title=@sprintf("Error analysis; case: %s", identifier),
+        title=@sprintf("Error analysis; case: %s", short_id(identifier)),
         label="predicted throughput error"
     )
     plot!(p,
@@ -182,9 +193,9 @@ function plot_time_by_time_res(data, N, M)
         data["time_res"][1:M:end],
         data["time"][1:M:end],
         xaxis=("time resolution", :log10),
-        yaxis=("run time"), #, :log10),
-        title=@sprintf("Median time vs. tr; batches: %d; case: %s", data["batch_size"][1], identifier),
-        label=@sprintf("Disc Th., mr=%d", data["mem_res"][1]),
+        yaxis=("run time [s]"), #, :log10),
+        title=@sprintf("Median time vs. tr; B=%d; %s", data["batch_size"][1], short_id(identifier)),
+        label=@sprintf("num Th., mr=%d", data["mem_res"][1]),
         mark=(N>100 ? :none : :circle),
         legend=:topleft
     )
@@ -192,7 +203,7 @@ function plot_time_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end],
             data["time"][m:M:end],
-            label=@sprintf("Disc Th., mr=%d", data["mem_res"][m]),
+            label=@sprintf("num Th., mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
@@ -206,7 +217,7 @@ function plot_th_by_mem_res(data, N, M)
         data["num_th"][1:M],
         xaxis=("memory resolution", :log10),
         yaxis=("throughput"),
-        title=@sprintf("Th vs. mr; case: %s", identifier),
+        title=@sprintf("Th vs. mr; case: %s", short_id(identifier)),
         label=@sprintf("Disc Th., tr=%d", data["time_res"][1]),
         mark=:circle,
         legend=:bottomright
@@ -231,7 +242,7 @@ function plot_errest_by_mem_res(data, N, M)
         vals[vals.>0],
         xaxis=("memory resolution", :log10),
         yaxis=("error estimate", :log10),
-        title=@sprintf("Error estimate vs. mr; case: %s", identifier),
+        title=@sprintf("Error estimate vs. mr; case: %s", short_id(identifier)),
         label=@sprintf("Disc Th., tr=%d", data["time_res"][1]),
         mark=:circle,
         legend=:topright
@@ -256,7 +267,7 @@ function plot_time_by_mem_res(data, N, M)
         data["time"][1:M],
         xaxis=("memory resolution", :log10),
         yaxis=("run time"),
-        title=@sprintf("Median time vs. mr; batches: %d; case: %s", data["batch_size"][1], identifier),
+        title=@sprintf("Median time vs. mr; batches: %d; case: %s", data["batch_size"][1], short_id(identifier)),
         label=@sprintf("Disc Th., tr=%d", data["time_res"][1]),
         mark=:circle,
         legend=:bottomright
@@ -279,9 +290,9 @@ function plot_errest_by_time(data, N, M)
         data["time"][1:M:end][vals.>0],
         vals[vals.>0],
         xaxis=("time [s]"),
-        yaxis=("error estimate (Th)", :log10),
-        title=@sprintf("Error est. vs. median time; batches: %d; case: %s", data["batch_size"][1], identifier),
-        label=@sprintf("Total error, mr=%d", data["mem_res"][1]),
+        yaxis=("error estimate (in Th) [ops/s]", :log10),
+        title=@sprintf("Error est. vs. median time; B=%d; %s", data["batch_size"][1], short_id(identifier)),
+        label=@sprintf("total error, mr=%d", data["mem_res"][1]),
         seriestype=:scatter,
         mark=:x,
         legend=:topright
@@ -291,7 +302,7 @@ function plot_errest_by_time(data, N, M)
         plot!(p,
             data["time"][m:M:end][vals.>0],
             vals[vals.>0],
-            label=@sprintf("Total error, mr=%d", data["mem_res"][m]),
+            label=@sprintf("total error, mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
             mark=:x
         )
@@ -301,7 +312,7 @@ function plot_errest_by_time(data, N, M)
         plot!(p,
             data["time"][m:M:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Solution error, mr=%d", data["mem_res"][m]),
+            label=@sprintf("solution error, mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
             mark=:circle
         )
@@ -314,9 +325,9 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         data1["time_res"][1:M1:end],
         data1["num_th"][1:M1:end],
         xaxis=("time resolution", :log10),
-        yaxis=("throughput"),
-        title=@sprintf("Th vs. tr comp; case: %s, %s", identifier, identifier2),
-        label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][1]),
+        yaxis=("throughput [ops/s]"),
+        title=@sprintf("Th vs. tr comp; %s, %s", short_id(identifier), short_id(identifier2)),
+        label=@sprintf("num Th., %s, mr=%d", short_id(identifier), data1["mem_res"][1]),
         mark=:x,
         legend=:bottomright
     )
@@ -324,7 +335,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data1["time_res"][m:M1:end],
             data1["num_th"][m:M1:end],
-            label=@sprintf("Disc Th., %s, mr=%d", identifier, data1["mem_res"][m]),
+            label=@sprintf("num Th., %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
             mark=:x
         )
     end
@@ -332,7 +343,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data2["time_res"][m:M2:end],
             data2["num_th"][m:M2:end],
-            label=@sprintf("Disc Th., %s, mr=%d", identifier2, data2["mem_res"][m]),
+            label=@sprintf("num Th., %s, mr=%d", short_id(identifier2), data2["mem_res"][m]),
             mark=:none
         )
     end
@@ -340,8 +351,8 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data1["time_res"][m:M1:end],
             data1["exa_th"][m:M1:end],
-            label=@sprintf("Throughput sparse, mr=%d", data1["mem_res"][m]),
-	    seriestype=:scatter,
+            label=@sprintf("Th sparse, mr=%d", data1["mem_res"][m]),
+	        seriestype=:scatter, 
             mark=:circle
         )
     end
@@ -349,7 +360,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data2["time_res"][m:M2:end],
             data2["exa_th"][m:M2:end],
-            label=@sprintf("Throughput dense, mr=%d", data2["mem_res"][m]),
+            label=@sprintf("Th dense, mr=%d", data2["mem_res"][m]),
             mark=:none
         )
     end
@@ -363,9 +374,9 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         data1["time_res"][1:M1:end][vals1.>0],
         vals1[vals1.>0],
         xaxis=("time resolution", :log10),
-        yaxis=("error estimate (Th)", :log10),
-        title=@sprintf("Error estimate vs. tr comp; case: %s, %s", identifier, identifier2),
-        label=@sprintf("Total error, %s, mr=%d", identifier, data1["mem_res"][1]),
+        yaxis=("error estimate (in Th) [ops/s]", :log10),
+        title=@sprintf("Error est. vs. tr comp; %s, %s", short_id(identifier), short_id(identifier2)),
+        label=@sprintf("total error, %s, mr=%d", short_id(identifier), data1["mem_res"][1]),
         mark=:x,
         legend=:topright
     )
@@ -374,7 +385,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data1["time_res"][m:M1:end][vals1.>0],
             vals1[vals1.>0],
-            label=@sprintf("Total error, %s, mr=%d", identifier, data1["mem_res"][m]),
+            label=@sprintf("total error, %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
             mark=:x
         )
     end
@@ -383,7 +394,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data2["time_res"][m:M2:end][vals2.>0],
             vals2[vals2.>0],
-            label=@sprintf("Total error, %s, mr=%d", identifier2, data2["mem_res"][m]),
+            label=@sprintf("total error, %s, mr=%d", short_id(identifier2), data2["mem_res"][m]),
             mark=:none
         )
     end
@@ -402,7 +413,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data2["time_res"][m:M2:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("Solution error dense, mr=%d", data2["mem_res"][m]),
+            label=@sprintf("solution error dense, mr=%d", data2["mem_res"][m]),
 	    mark=:none
         )
     end
@@ -422,7 +433,7 @@ function throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
         error_series[error_series.>TOL],
         xaxis=("time resolution", :log10),
         yaxis=("throughput deviation", :log10),
-        title=@sprintf("Th deviation; case: %s, %s", identifier, identifier2),
+        title=@sprintf("Th deviation; case: %s, %s", short_id(identifier), short_id(identifier2)),
         label=@sprintf("Error deviation, mr=%d", data1["mem_res"][1]),
         seriestype=:scatter,
         mark=:x,
