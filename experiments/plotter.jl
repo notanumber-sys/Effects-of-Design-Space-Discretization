@@ -388,6 +388,7 @@ function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         )
     end
     savefigs(p, "th_vs_tr")
+    return p
 end
 
 function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
@@ -453,6 +454,7 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         )
     end
     savefigs(p, "err_vs_tr")
+    return p
 end
 
 #TODO: Update
@@ -525,9 +527,12 @@ function double_analysis(identifier_sparse, identifier_dense)
     end
 
     # make plots
-    plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
-    plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
+    p1 = plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
+    p2 = plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
+
+    cp = plot(p1, p2, layout=(2, 1), size=(600, 800))
+    savefigs(cp, "combo")
 end
 
 # determine target
