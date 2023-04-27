@@ -6,13 +6,13 @@ do
     ./plotter.jl sobel${i} sobel${i}ddense
 done
 
-#for i in 2 3 4
-#do
-#    echo "R${i}..."
-#    ./plotter.jl rasta${i}
-#    ./plotter.jl rasta${i}ddense
-#    ./plotter.jl rasta${i} rasta${i}ddense
-#done
+for i in 2 3 4
+do
+    echo "R${i}..."
+    ./plotter.jl rasta${i}
+    ./plotter.jl rasta${i}ddense
+    ./plotter.jl rasta${i} rasta${i}ddense
+done
 
 for i in 2 3
 do
