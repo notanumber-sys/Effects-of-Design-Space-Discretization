@@ -6,6 +6,14 @@ do
     ./plotter.jl sobel${i} sobel${i}ddense
 done
 
+#for i in 2 3 4
+#do
+#    echo "R${i}..."
+#    ./plotter.jl rasta${i}
+#    ./plotter.jl rasta${i}ddense
+#    ./plotter.jl rasta${i} rasta${i}ddense
+#done
+
 for i in 2 3
 do
     echo "J${i}..."
@@ -30,12 +38,12 @@ do
     ./plotter.jl rastajpegsdf${i} rastajpegsdf${i}dense
 done
 
-#for i in 2
-#do
-#    echo "SRJ${i}..."
-#    ./plotter.jl sobelrastajpegsdf${i}
-#    ./plotter.jl sobelrastajpegsdf${i}dense
-#    ./plotter.jl sobelrastajpegsdf${i} sobelrastajpegsdf${i}dense
-#done
+for i in 2
+do
+    echo "SRJ${i}..."
+    ./plotter.jl sobelrastajpegsdf${i}
+    ./plotter.jl sobelrastajpegsdf${i}dense
+    ./plotter.jl sobelrastajpegsdf${i} sobelrastajpegsdf${i}dense
+done
 
 echo "DONE!"

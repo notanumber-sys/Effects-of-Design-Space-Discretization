@@ -10,7 +10,7 @@ using LinearAlgebra, Interpolations
 
 # mode if program is run as script
 mode = abspath(PROGRAM_FILE) == @__FILE__
-formats = ["png", "svg"]
+formats = ["png", "svg", "pdf"]
 
 function read_data(path::String)
     data = CSV.File(path)
@@ -51,7 +51,7 @@ function short_id(identifier)
         "rasta" => "R",
         "jpegsdf" => "J",
         "ddense" => "dd",
-        "dense" => "dense"
+        "dense" => "d"
     )
 end
 
@@ -61,19 +61,21 @@ function plot_th_by_time_res(data, N, M)
         data["num_th"][1:M:end],
         xaxis=("time resolution", :log10),
         yaxis=("throughput [ops/s]"),
-        title=@sprintf("Th vs. tr; %s", short_id(identifier)),
-        label=@sprintf("Num Th., mr=%d", data["mem_res"][1]),
-        mark=(N>100 ? :none : :x),
-        legend=:bottomright,
-        linestyle=:dash
+        title=@sprintf("Throughput vs. time resolution; %s", short_id(identifier)),
+        label=@sprintf("num Th., mr=%d", data["mem_res"][1]),
+        mark=(N>100 ? :x : :x),
+        markersize=(N>100 ? 3 : 4),
+        color=1,
+        legend=:bottomright
     )
     for m in 2:M
         plot!(p,
             data["time_res"][m:M:end],
             data["num_th"][m:M:end],
             label=@sprintf("num Th., mr=%d", data["mem_res"][m]),
-            mark=(N>100 ? :none : :x),
-            linestyle=:dash
+            mark=(N>100 ? :x : :x),
+            markersize=(N>100 ? 3 : 4),
+            color=m
         )
     end
     for m in 1:M
@@ -81,7 +83,9 @@ function plot_th_by_time_res(data, N, M)
             data["time_res"][m:M:end],
             data["exa_th"][m:M:end],
             label=@sprintf("Th, mr=%d", data["mem_res"][m]),
-            mark=(N>100 ? :none : :circle)
+            mark=(N>100 ? :circle : :circle),
+            markersize=(N>100 ? 2 : 4),
+            color=(M + m)
         )
     end
     savefigs(p, "th_vs_tr")
@@ -129,11 +133,12 @@ function plot_errest_by_time_res(data, N, M)
         vals[vals.>0],
         xaxis=("time resolution", :log10),
         yaxis=("error estimate (in Th) [ops/s]", :log10),
-        title=@sprintf("Error vs. tr; %s", short_id(identifier)),
+        title=@sprintf("Error vs. time resolution; %s", short_id(identifier)),
         label=@sprintf("total error, mr=%d", data["mem_res"][1]),
-        mark=(N>100 ? :none : :x),
-        legend=:topright,
-        linestyle=:dash
+        mark=(N>100 ? :x : :x),
+        markersize=(N>100 ? 3 : 4),
+        color=1,
+        legend=:topright
     )
     for m in 2:M
         vals = correct.-data["num_th"][m:M:end]
@@ -141,8 +146,9 @@ function plot_errest_by_time_res(data, N, M)
             data["time_res"][m:M:end][vals.>0],
             vals[vals.>0],
             label=@sprintf("total error, mr=%d", data["mem_res"][m]),
-            mark=(N>100 ? :none : :x),
-            linestyle=:dash
+            mark=(N>100 ? :x : :x),
+            markersize=(N>100 ? 3 : 4),
+            color=m
         )
     end
     for m in 1:M
@@ -151,7 +157,9 @@ function plot_errest_by_time_res(data, N, M)
             data["time_res"][m:M:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
             label=@sprintf("solution error, mr=%d", data["mem_res"][m]),
-            mark=(N>100 ? :none : :circle)
+            mark=(N>100 ? :circle : :circle),
+            markersize=(N>100 ? 2 : 4),
+            color=(M + m)
         )
     end
     savefigs(p, "err_vs_tr")
@@ -295,6 +303,7 @@ function plot_errest_by_time(data, N, M)
         label=@sprintf("total error, mr=%d", data["mem_res"][1]),
         seriestype=:scatter,
         mark=:x,
+        color=1,
         legend=:topright
     )
     for m in 2:M
@@ -304,7 +313,8 @@ function plot_errest_by_time(data, N, M)
             vals[vals.>0],
             label=@sprintf("total error, mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
-            mark=:x
+            mark=:x,
+            color=m
         )
     end
     for m in 1:M
@@ -314,7 +324,8 @@ function plot_errest_by_time(data, N, M)
             vals_exa[vals_exa.>0],
             label=@sprintf("solution error, mr=%d", data["mem_res"][m]),
             seriestype=:scatter,
-            mark=:circle
+            mark=:circle,
+            color=(M + m)
         )
     end
     savefigs(p, "err_vs_t.png")
@@ -322,90 +333,101 @@ end
 
 function plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     p = plot(
-        data1["time_res"][1:M1:end],
-        data1["num_th"][1:M1:end],
+        data2["time_res"][1:M2:end],
+        data2["num_th"][1:M2:end],
         xaxis=("time resolution", :log10),
         yaxis=("throughput [ops/s]"),
-        title=@sprintf("Th vs. tr comp; %s, %s", short_id(identifier), short_id(identifier2)),
-        label=@sprintf("num Th., %s, mr=%d", short_id(identifier), data1["mem_res"][1]),
+        title=@sprintf("Throughput vs. time resolution; %s, %s", short_id(identifier), short_id(identifier2)),
+        label=@sprintf("num Th., %s, mr=%d", short_id(identifier2), data2["mem_res"][1]),
         mark=:x,
+        markersize=3,
+        linestyle=:dash,
+        color=1,
         legend=:bottomright
     )
-    for m in 2:M1
-        plot!(p,
-            data1["time_res"][m:M1:end],
-            data1["num_th"][m:M1:end],
-            label=@sprintf("num Th., %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
-            mark=:x
-        )
-    end
-    for m in 1:M2
+    for m in 2:M2
         plot!(p,
             data2["time_res"][m:M2:end],
             data2["num_th"][m:M2:end],
             label=@sprintf("num Th., %s, mr=%d", short_id(identifier2), data2["mem_res"][m]),
-            mark=:none
+            mark=:x,
+            markersize=3,
+            linestyle=:dash,
+            color=m
         )
     end
     for m in 1:M1
         plot!(p,
             data1["time_res"][m:M1:end],
-            data1["exa_th"][m:M1:end],
-            label=@sprintf("Th sparse, mr=%d", data1["mem_res"][m]),
-	        seriestype=:scatter, 
-            mark=:circle
+            data1["num_th"][m:M1:end],
+            label=@sprintf("num Th., %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
+            mark=:circle,
+            seriestype=:scatter,
+            color=m
         )
     end
     for m in 1:M2
         plot!(p,
             data2["time_res"][m:M2:end],
             data2["exa_th"][m:M2:end],
-            label=@sprintf("Th dense, mr=%d", data2["mem_res"][m]),
-            mark=:none
+            label=@sprintf("Th., %s, mr=%d", short_id(identifier2), data2["mem_res"][m]),
+            mark=:x,
+            markersize=3,
+            linestyle=:dash,
+            color=(M1 + m)
+        )
+    end
+    for m in 1:M1
+        plot!(p,
+            data1["time_res"][m:M1:end],
+            data1["exa_th"][m:M1:end],
+            label=@sprintf("Th., %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
+	        seriestype=:scatter, 
+            mark=:circle,
+            color=(M1 + m)
         )
     end
     savefigs(p, "th_vs_tr")
+    return p
 end
 
 function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     correct = max(maximum(data1["exa_th"]), maximum(data2["exa_th"]))
-    vals1 = correct.-data1["num_th"][1:M1:end]
+    vals2 = correct.-data2["num_th"][1:M2:end]
     p = plot(
-        data1["time_res"][1:M1:end][vals1.>0],
-        vals1[vals1.>0],
+        data2["time_res"][1:M2:end][vals2.>0],
+        vals2[vals2.>0],
+        label=@sprintf("total error, %s, mr=%d", short_id(identifier2), data2["mem_res"][1]),
+        mark=:x,
+        markersize=3,
+        linestyle=:dash,
+        color=1,
         xaxis=("time resolution", :log10),
         yaxis=("error estimate (in Th) [ops/s]", :log10),
-        title=@sprintf("Error est. vs. tr comp; %s, %s", short_id(identifier), short_id(identifier2)),
-        label=@sprintf("total error, %s, mr=%d", short_id(identifier), data1["mem_res"][1]),
-        mark=:x,
-        legend=:topright
+        title=@sprintf("Error estimate vs. time resolution; %s, %s", short_id(identifier), short_id(identifier2)),
+        legend=:bottomleft
     )
-    for m in 2:M1
-        vals1 = correct.-data1["num_th"][m:M1:end]
-        plot!(p,
-            data1["time_res"][m:M1:end][vals1.>0],
-            vals1[vals1.>0],
-            label=@sprintf("total error, %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
-            mark=:x
-        )
-    end
-    for m in 1:M2
+    for m in 2:M2
         vals2 = correct.-data2["num_th"][m:M2:end]
         plot!(p,
             data2["time_res"][m:M2:end][vals2.>0],
             vals2[vals2.>0],
             label=@sprintf("total error, %s, mr=%d", short_id(identifier2), data2["mem_res"][m]),
-            mark=:none
+            mark=:x,
+            markersize=3,
+            linestyle=:dash,
+            color=m
         )
     end
     for m in 1:M1
-        vals_exa = correct.-data1["exa_th"][m:M1:end]
+        vals1 = correct.-data1["num_th"][m:M1:end]
         plot!(p,
-            data1["time_res"][m:M1:end][vals_exa.>0],
-            vals_exa[vals_exa.>0],
-            label=@sprintf("Solution error sparse, mr=%d", data1["mem_res"][m]),
-	    seriestype=:scatter,
-            mark=:circle
+            data1["time_res"][m:M1:end][vals1.>0],
+            vals1[vals1.>0],
+            label=@sprintf("total error, %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
+            mark=:circle,
+            seriestype=:scatter,
+            color=m
         )
     end
     for m in 1:M2
@@ -413,11 +435,26 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
         plot!(p,
             data2["time_res"][m:M2:end][vals_exa.>0],
             vals_exa[vals_exa.>0],
-            label=@sprintf("solution error dense, mr=%d", data2["mem_res"][m]),
-	    mark=:none
+            label=@sprintf("solution error, %s, mr=%d", short_id(identifier2), data2["mem_res"][m]),
+    	    mark=:x,
+            markersize=3,
+            linestyle=:dash,
+            color=(M1 + m)
+        )
+    end
+    for m in 1:M1
+        vals_exa = correct.-data1["exa_th"][m:M1:end]
+        plot!(p,
+            data1["time_res"][m:M1:end][vals_exa.>0],
+            vals_exa[vals_exa.>0],
+            label=@sprintf("solution error, %s, mr=%d", short_id(identifier), data1["mem_res"][m]),
+    	    seriestype=:scatter,
+            mark=:circle,
+            color=(M1 + m)
         )
     end
     savefigs(p, "err_vs_tr")
+    return p
 end
 
 #TODO: Update
@@ -433,7 +470,7 @@ function throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
         error_series[error_series.>TOL],
         xaxis=("time resolution", :log10),
         yaxis=("throughput deviation", :log10),
-        title=@sprintf("Th deviation; case: %s, %s", short_id(identifier), short_id(identifier2)),
+        title=@sprintf("Throughput deviation; case: %s, %s", short_id(identifier), short_id(identifier2)),
         label=@sprintf("Error deviation, mr=%d", data1["mem_res"][1]),
         seriestype=:scatter,
         mark=:x,
@@ -442,7 +479,7 @@ function throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
     plot!(p,
         data2["time_res"][1:M2:end][index_set],
         ref.(data2["time_res"][1:M2:end][index_set]),
-        label=@sprintf("Reference %.2f/x", error_series[max_index]),
+        label=@sprintf("Reference %.3f/x", error_series[max_index]),
         linestyle=:dash
     )
     savefigs(p, "th_dev_vs_tr")
@@ -490,9 +527,12 @@ function double_analysis(identifier_sparse, identifier_dense)
     end
 
     # make plots
-    plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
-    plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
+    p1 = plot_th_by_time_res_comp(data1, N1, M1, data2, N2, M2)
+    p2 = plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
+
+    cp = plot(p1, p2, layout=(2, 1), size=(600, 800))
+    savefigs(cp, "combo")
 end
 
 # determine target
