@@ -203,7 +203,7 @@ function plot_time_by_time_res(data, N, M)
         xaxis=("time resolution", :log10),
         yaxis=("run time [s]"), #, :log10),
         title=@sprintf("Median time vs. tr; B=%d; %s", data["batch_size"][1], short_id(identifier)),
-        label=@sprintf("num Th., mr=%d", data["mem_res"][1]),
+        label=@sprintf("run time, mr=%d", data["mem_res"][1]),
         mark=(N>100 ? :none : :circle),
         legend=:topleft
     )
@@ -211,7 +211,7 @@ function plot_time_by_time_res(data, N, M)
         plot!(p,
             data["time_res"][m:M:end],
             data["time"][m:M:end],
-            label=@sprintf("num Th., mr=%d", data["mem_res"][m]),
+            label=@sprintf("run time, mr=%d", data["mem_res"][m]),
             mark=(N>100 ? :none : :circle)
         )
     end
