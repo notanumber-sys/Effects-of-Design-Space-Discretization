@@ -197,14 +197,16 @@ function plot_errest_by_time_res_analysis(data, N, M)
 end
 
 function plot_time_by_time_res(data, N, M)
+    picklog = maximum(data["time"])/minimum(data["time"])>50
     p = plot(
         data["time_res"][1:M:end],
         data["time"][1:M:end],
         xaxis=("time resolution", :log10),
-        yaxis=("run time [s]"), #, :log10),
+        yaxis=("run time [s]", picklog ? :log10 : :identity),
         title=@sprintf("Median time vs. tr; B=%d; %s", data["batch_size"][1], short_id(identifier)),
         label=@sprintf("run time, mr=%d", data["mem_res"][1]),
-        mark=(N>100 ? :none : :circle),
+        mark=(N>100 ? (picklog ? :circle : :none) : :circle),  # nested ternaries are good practice
+        markersize=(N>100 ? 2 : 4),
         legend=:topleft
     )
     for m in 2:M
