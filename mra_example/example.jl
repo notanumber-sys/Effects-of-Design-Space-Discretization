@@ -91,7 +91,7 @@ end
 
 p1 = plot(
     0:N_LEVELS,
-    errors,
+    errors.^(1/2),
     yaxis=("L2-error", :log10),
     xaxis=("m"),
     title="Error",
