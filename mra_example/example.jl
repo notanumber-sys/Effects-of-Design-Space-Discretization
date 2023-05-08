@@ -9,13 +9,23 @@ psimn = (x, m, n) -> 2^(m/2)*psi(x*2^m - n)
 
 # configuration
 f = x -> sin(3*pi*x)
-N_LEVELS = 6
-showlevels = [0, 2, 4, 6]
-series = 0:2^(-12):1
+N_LEVELS = 8
+showlevels = [0, 2, 5, 8]
+#series = 0:2^(-12):1
+series = 0:1e-4:1
+
+function psi_projection(f, m, n)
+    point1 = 2.0^(-m)*(n)
+    point2 = 2.0^(-m)*(n + 1/2)
+    point3 = 2.0^(-m)*(n + 1)
+    integral1, _ = quadgk(f, point1, point2, rtol=1e-10)
+    integral2, _ = quadgk(f, point2, point3, rtol=1e-10)
+    return 2^(m/2)*(integral1 - integral2)
+end
 
 function projection(f, b)
     # this is probably very inefficient since the basis functions are not smooth
-    integral, err = quadgk(x -> f(x)*b(x), 0, 1, rtol=1e-10)
+    integral, err = quadgk(x -> f(x)*b(x), 0, 1, rtol=1e-12)
     return integral
 end
 
@@ -35,24 +45,27 @@ if 0 in showlevels
     plots = [
         plot(
             series,
-            c00*phi.(series),
+            coefficients[end]*phi.(series),
             label="approximation",
             title="m=0",
             xlabel="x",
-            ylabel="f(x)"
+            ylabel="f(x)",
+            legend=:bottomright
         )
     ]
 end
-errors[1], _ = quadgk(x -> (f(x) - evaluate(functions, coefficients, x))^2, 0, 1, rtol=10e-10)
+#errors[1], _ = quadgk(x -> (f(x) - evaluate(functions, coefficients, x))^2, 0, 1, rtol=10e-10)
+delta = x -> (f(x) - evaluate(functions, coefficients, x))^2
+errors[1] = sqrt(maximum(delta.(series)))
 
 for m in 1:N_LEVELS
-    @show(coefficients)
+    #@show(coefficients)
     @printf("m=%d\n", m)
 
     for n in 0:(2^m - 1)
-        @printf("i=%d, m=%d, n=%d\n", length(functions) + 1, m, n)
         push!(functions,    x -> psimn(x, m, n))
-        push!(coefficients, projection(f, functions[end]))
+        push!(coefficients, psi_projection(f, m, n))
+        #@printf("i=%d, m=%d, n=%d ... c=%f\n", length(functions) + 1, m, n, coefficients[end])
     end
 
     if m in showlevels
@@ -64,13 +77,16 @@ for m in 1:N_LEVELS
                 label="approximation",
                 title=@sprintf("m=%d", m),
                 xlabel="x",
-                ylabel="f(x)"
+                ylabel="f(x)",
+                legend=:bottomright
             )
         )
     end
-    errors[m + 1], _ = quadgk(x -> (f(x) - evaluate(functions, coefficients, x))^2, 0, 1, rtol=10e-10)
+    #errors[m + 1], _ = quadgk(x -> (f(x) - evaluate(functions, coefficients, x))^2, 0, 1, rtol=10e-10)
+    local delta = x -> (f(x) - evaluate(functions, coefficients, x))^2
+    errors[m + 1] = sqrt(maximum(delta.(series)))
 end
-@show(coefficients)
+#@show(coefficients)
 
 for p in plots
     plot!(p,
@@ -92,7 +108,7 @@ end
 p1 = plot(
     0:N_LEVELS,
     errors.^(1/2),
-    yaxis=("L2-error", :log10),
+    yaxis=("max-error", :log10),
     xaxis=("m"),
     title="Error",
     marker=:circle,
@@ -103,3 +119,4 @@ savefig(p1, "error.png")
 
 p2 = plot(plots[1], plots[2], plots[3], plots[4], layout=(length(plots), 1), size=(800, 300*length(plots)))
 savefig(p2, "approximations.png")
+savefig(p2, "approximations.pdf")
