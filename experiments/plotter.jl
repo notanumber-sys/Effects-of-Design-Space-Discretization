@@ -321,6 +321,94 @@ function plot_errest_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     return p
 end
 
+function insert_bound_estimates(p1, data1, N1, M1, p2, data2, N2, M2, identifier)
+    sid = short_id(identifier)
+    firing_card = 0.0
+    actors_time = 0.0
+    t_max = 0.0
+    # values computed in report, see section 5.4.3.1
+    firing_cards = [4, 7, 16]
+    actors_times = [776.1, 1315.6, 10062.0].*(1e-6)
+    comm_times = [0.56, 0.6, 0.8].*(1e-6)    
+    # compute estimate throughput bound from lookup
+    for (i, id) in enumerate(["S", "R", "J"])
+        if occursin(id, sid)
+            firing_card += firing_cards[i]
+            actors_time += actors_times[i]
+            t_max += actors_times[i]+ comm_times[i]
+        end
+    end
+    # obtain tiles
+    tiles = 0.0
+    for i in 1:9
+        if occursin(string(i), sid)
+            tiles += i
+        end
+    end
+    gamma = 2 # single communication element
+    # optimal throughput bound
+    throughput_bound = tiles/actors_time
+    bound_type = "bound"
+    throughput = max(maximum(data1["exa_th"]), maximum(data2["exa_th"]))
+
+    if maximum(data2["exa_th"]) != data2["exa_th"][end]
+        throughput = throughput_bound
+        bound_type = "approximate bound"
+    end
+
+    # total bounding coefficient
+    C = throughput^2 * firing_card * t_max * (gamma + 1)
+    ebound = p -> 2*C/p
+    tbound = p -> throughput - ebound(p)
+
+    # add bound to throughput plot
+    plot!(p1,
+        data2["time_res"][1:M2:end],
+        tbound.(data2["time_res"][1:M2:end]),
+        label=@sprintf("%s, C=%.2f", bound_type, C),
+        ylims=(0, 1.05*throughput),
+        color=:red,
+        linestyle=:dash
+    )
+
+    # add bound to error plot
+    plot!(p2,
+        data2["time_res"][1:M2:end],
+        ebound.(data2["time_res"][1:M2:end]),
+        label=@sprintf("%s, C=%.2f", bound_type, C),
+        color=:red,
+        linestyle=:dash
+    )
+end
+
+#TODO: Update
+function throughput_deviation_comp(data1, N1, M1, data2, N2, M2)
+    TOL = 1e-8
+    interpolator = LinearInterpolation(data1["time_res"][1:M1:end], data1["num_th"][1:M1:end])
+    index_set = (data2["time_res"][1:M2:end].>=data1["time_res"][1]).&(data2["time_res"][1:M2:end].<=data1["time_res"][end])
+    error_series = abs.(data2["num_th"][1:M2:end][index_set] - interpolator.(data2["time_res"][1:M2:end][index_set]))
+    max_index = argmax(error_series.*data2["time_res"][1:M2:end][index_set])
+    ref = x -> (error_series[max_index]*data2["time_res"][1:M2:end][index_set][max_index])/x
+    p = plot(
+        data2["time_res"][1:M2:end][index_set][error_series.>TOL],
+        error_series[error_series.>TOL],
+        xaxis=("time resolution", :log10),
+        yaxis=("throughput deviation", :log10),
+        title=@sprintf("Throughput deviation; case: %s, %s", short_id(identifier), short_id(identifier2)),
+        label=@sprintf("Error deviation, mr=%d", data1["mem_res"][1]),
+        seriestype=:scatter,
+        mark=:x,
+        legend=:topright
+    )
+    plot!(p,
+        data2["time_res"][1:M2:end][index_set],
+        ref.(data2["time_res"][1:M2:end][index_set]),
+        label=@sprintf("Reference %.3f/x", error_series[max_index]),
+        linestyle=:dash
+    )
+    savefigs(p, "th_dev_vs_tr")
+end
+
 function plot_errdiv_by_time_res_comp(data1, N1, M1, data2, N2, M2)
     @printf("TBD\n")
 end
@@ -365,7 +453,10 @@ function double_analysis(identifier_sparse, identifier_dense)
     cp = plot(p1, p2, layout=(2, 1), size=(600, 800))
     savefigs(cp, "combo")
 
-
+    insert_bound_estimates(p1, data1, N1, M1, p2, data2, N2, M2, identifier)
+    savefigs(p1, "th_vs_tr_bounds")
+    cpb = plot(p1, p2, layout=(2, 1), size=(600, 800))
+    savefigs(cpb, "combo_bounds")
 end
 
 # determine target
