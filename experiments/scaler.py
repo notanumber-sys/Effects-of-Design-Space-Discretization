@@ -20,6 +20,7 @@ def scale(identifier):
     
     with open(data_path, "w", newline='') as handle:
         writer = csv.DictWriter(handle, fieldnames=HEADER)
+        writer.writeheader()
         for entry in entries:
             #print(entry)
             writer.writerow({
