@@ -1,5 +1,9 @@
 # Effects of Design Space Discretization on Constraint Based Design Space Exploration
-This is the repository containing code and related material for the master's thesis project *Effects of Design Space Discretization on Constraint Based Design Space Exploration*. The following instructions are for the code contained in the `experiments`-subdirectory which is what is relevant for reproducing the results.
+This is the repository containing code and related material for the master's thesis project *Effects of Design Space Discretization on Constraint Based Design Space Exploration*. The following instructions are for the code contained in the `experiments`-subdirectory which is what is relevant for reproducing the results. The other directories in the repository are:
+ - `figures`: Contains the figures used in the report.
+ - `mra_example`: Contains the code to generate the figure illustrating MRA included in the report.
+ - `plan`: The initial project plan.
+ - `tests`: Various solutions to constraint-programming problems.
 
 ## Installation
 Requirements:
