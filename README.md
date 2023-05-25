@@ -1,4 +1,4 @@
-# sf250X-thesis
+# Effects of Design Space Discretization on Constraint Based Design Space Exploration
 This is the repository containing code and related material for the master's thesis project *Effects of Design Space Discretization on Constraint Based Design Space Exploration*. The following instructions are for the code contained in the `experiments`-subdirectory which is what is relevant for reproducing the results.
 
 ## Installation
