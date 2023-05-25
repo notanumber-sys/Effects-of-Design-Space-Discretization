@@ -1,7 +1,9 @@
 # sf250X-thesis
+This is the repository containing code and related material for the master's thesis project *Effects of Design Space Discretization on Constraint Based Design Space Exploration*. The following instructions are for the code contained in the `experiments`-subdirectory which is what is relevant for reproducing the results.
+
 ## Installation
 Requirements:
- - Java 10 or higher. [check this!]
+ - Java 11 or higher.
  - Bash shell (tested in Cygwin and Ubuntu)
  - Python 3.9 or higher
  - [Julia](https://julialang.org/downloads/) with packages: Printf, Plots, CSV, LinearAlgebra, Interpolations
@@ -10,7 +12,8 @@ Installation:
 1. Make sure that all requirements are met.
 2. Clone this repository.
 3. Download [IDeSyDe](https://github.com/forsyde/IDeSyDe) 0.5.x, chose the correct version depending on your OS.
-4. Extract IDeSyDe into the root directory of the repository. This should add two directories: emodules and imodules; and the platform dependent IDeSyDe entry point.
+4. Extract IDeSyDe into the `experiments`-directory. This should add two directories: emodules and imodules; and the platform dependent IDeSyDe entry point.
+5. (for Windows) change the name of the IDeSyDe entry point in `run.sh`, *i.e.,* change `"idesyde"` to `"idesyde.exe"` on line 16.
 
 ## Usage
 Each experiment is identified by a unique identifier. An experiment is defined by a directory named `in_case_<identifier>`. This directory should contain a configuration file called `config` with the following format:
