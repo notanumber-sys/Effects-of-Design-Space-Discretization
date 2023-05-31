@@ -5,7 +5,7 @@ exec julia --color=yes --startup-file=no "${BASH_SOURCE[0]}" "$@"
 
 #@show ARGS
 
-using Printf, Plots, CSV
+using Printf, Plots, CSV, Measures
 using LinearAlgebra, Interpolations
 
 # mode if program is run as script
@@ -456,7 +456,7 @@ function double_analysis(identifier_sparse, identifier_dense)
     insert_bound_estimates(p1, data1, N1, M1, p2, data2, N2, M2, identifier)
     savefigs(p1, "th_vs_tr_bounds")
     cpb = plot(p1, p2, layout=(2, 1), size=(600, 800))
-    #cpb = plot(p1, p2, layout=(1, 2), size=(1000, 400))
+    #cpb = plot(p1, p2, layout=(1, 2), size=(1000, 500), margin=5mm)
     savefigs(cpb, "combo_bounds")
 end
 
