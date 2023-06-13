@@ -18,25 +18,25 @@ def get_throughput(data):
     return min(data)
 
 def convert(identifier):
-    data_src = Path(f"so_case_{identifier}")
-    cfg_src = Path(f"in_case_{identifier}/config")
-    time_src = Path(f"so_case_{identifier}/times")
-    res_file = Path(f"out_case_{identifier}.csv")
+    data_src = Path("so_case_{}".format(identifier))
+    cfg_src = Path("in_case_{}/config".format(identifier))
+    time_src = Path("so_case_{}/times".format(identifier))
+    res_file = Path("out_case_{}.csv".format(identifier))
     
     if (not data_src.is_dir()) or (not cfg_src.is_file()) or (not time_src.is_file()):
-        print(f"Failed! {identifier} is not a valid identifier!")
+        print("Failed! {} is not a valid identifier!".format(identifier))
         exit()
 
     # read configuration
     time_discs = None
     mem_discs = None
-    with open(cfg_src, "r") as handle:
+    with cfg_src.open("r") as handle:
         time_discs = [int(val) for val in handle.readline().strip().split()]
         mem_discs = [int(val) for val in handle.readline().strip().split()]
 
     times = []
     batch_size = 1
-    with open(time_src, "r") as handle:
+    with time_src.open("r") as handle:
         for line in handle:
             line = line.strip()
             if line == "":
@@ -49,14 +49,14 @@ def convert(identifier):
         print("Incorrect times format!")
         exit()
 
-    with open(res_file, "w", newline="") as handle:
+    with res_file.open("w", newline="") as handle:
         csv_writer = csv.DictWriter(handle, fieldnames=HEADER)
         csv_writer.writeheader()
         counter = 0
         for tr in time_discs:
             for mr in mem_discs:
-                json_src = Path(f"so_case_{identifier}/{tr}_{mr}.json")
-                json_handle = open(json_src, "r")
+                json_src = Path("so_case_{}/{}_{}.json".format(identifier, tr, mr))
+                json_handle = json_src.open("r")
                 json_data = json.load(json_handle)
                 json_handle.close()
                 entry = {

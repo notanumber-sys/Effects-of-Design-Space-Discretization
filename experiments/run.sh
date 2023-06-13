@@ -155,7 +155,7 @@ execute_case () {
     # the timed command is a call to the IDeSyDe entry point with output redirected to solution_dir/idesyde.out
     # the IDeSyDe solver runs a specific case and writes output to solution_dir/out_name.fiodl and intermediate
     #     data to a temporary run folder run_dir/
-    $({ time ./$IDESYDE_EXECUTABLE --x-time-resolution $proc_sm --x-memory-resolution $proc_md --x-total-time-out $IDESYDE_TIMEOUT --run-path $proc_run_dir -o "$solution_dir/$proc_out_name_fiodl" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name_loc )
+    $({ time ./$IDESYDE_EXECUTABLE -p 5 --x-time-resolution $proc_sm --x-memory-resolution $proc_md --x-total-time-out $IDESYDE_TIMEOUT --run-path $proc_run_dir -o "$solution_dir/$proc_out_name_fiodl" ${model[@]} >> $outfile ; } 2>$solution_dir/$proc_name_loc )
     # move resulting JSON
     local data_files=(${proc_run_dir}/explored/body_*.json)
 #    echo ""
@@ -195,7 +195,7 @@ do
 	do
 	    echo -n "."
 	    proc_name=idesyde_${sm}_${md}_${c}
-	    run_dir=run_${identifier}_${started}
+	    run_dir=run_${identifier}_${sm}_${md}_${c}_${started}
 	    execute_case $sm $md $out_name_fiodl $out_name_json $proc_name $run_dir &
 	    sleep 0.1
 	    ((started++))
